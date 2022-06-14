@@ -458,7 +458,7 @@ function stroke(args){
 function paper(args){
   var args =(args != undefined) ? args : {};
   var col = (args.col != undefined) ? args.col : [0.98,0.91,0.74];
-  var tex = (args.tex != undefined) ? args.tex : 20;
+  var tex = (args.tex != undefined) ? args.tex : 1;
   var spr = (args.spr != undefined) ? args.spr : 1;
 
   var canvas = document.createElement("canvas");
@@ -1251,8 +1251,8 @@ var Layer = new function(){
 CTX = Layer.empty();
 var BGCANV;
 
-PAPER_COL0 = [1,0.99,0.9]
-PAPER_COL1 = [0.98,0.91,0.74]
+PAPER_COL0 = [1,1,1]//[1,0.99,0.9]
+PAPER_COL1 = [1,1,1] //[0.98,0.91,0.74]
 
 // download generated image
 function makeDownload(){
@@ -1291,9 +1291,9 @@ function toggle(x,disp){
 function makeBG(){
   setTimeout(_makeBG,10)
   function _makeBG(){
-    BGCANV = paper({col:PAPER_COL0,tex:10,spr:0})
-    var img = BGCANV.toDataURL("image/png");
-    document.body.style.backgroundImage = 'url('+img+')';
+    BGCANV = paper({col:PAPER_COL0,tex:0,spr:0})
+    //var img = BGCANV.toDataURL("image/png");
+    //document.body.style.backgroundImage = 'url('+img+')';
   }
 }
 
@@ -1304,17 +1304,17 @@ function generate(){
   CTX.fillRect(0,0,CTX.canvas.width,CTX.canvas.height)
   //document.body.appendChild(CTX.canvas)
   var ppr = paper({col:PAPER_COL1})
-  for (var i = 0; i < CTX.canvas.width; i+= 512){
-    for (var j = 0; j < CTX.canvas.height; j+= 512){
-      CTX.drawImage(ppr,i,j);
-    }
-  }
+  // for (var i = 0; i < CTX.canvas.width; i+= 512){
+  //   for (var j = 0; j < CTX.canvas.height; j+= 512){
+  //     //CTX.drawImage(ppr,i,j);
+  //   }
+  // }
   if (Math.random() <= 0.5){
     woody({ctx:CTX,xof:300,yof:550,})
   }else{
     herbal({ctx:CTX,xof:300,yof:600,})
   }
-  Layer.border(CTX,squircle(0.98,3))
+  // Layer.border(CTX,squircle(0.98,3))
 }
 
 // reload page with given seed
