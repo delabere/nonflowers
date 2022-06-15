@@ -2,10 +2,33 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <script src="node_modules/named-web-colors/lib/named-web-colors.js"></script>
+    <script src="node_modules/colortranslator/dist/web/colortranslator.js"></script>
     <script src="main.js"></script>
+    <script src="classes/plant.js"></script>
+    <script src="classes/color.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&display=swap" rel="stylesheet">
+  
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Nonflowers</title>
-        
+    <style>
+      body {
+          font-family: 'Kristi', cursive;
+          color: #7A7658;
+      }
+      #flower-name h4 { 
+            margin-bottom: 0em;
+            font-size: 2.7em !important;
+            font-weight: 100;
+            color: #767676;
+        }
+        #flower-name p {
+          font-family: 'Loved by the King', cursive;
+          font-size: 1.2em;
+       }
+      </style>
   </head>
   <body onload="load()">
     
@@ -20,6 +43,9 @@
       <div><br></div>
       <div id="canvas-container"></div>
       <div><br></div>
+      <div id="flower-name">
+
+      </div>
       <table align="center" style="width:600px; ">
         <tr><td align="right">
           <div id="options" class="option-bar">

@@ -34,6 +34,11 @@ var sin = Math.sin
 var cos = Math.cos
 var abs = Math.abs
 var pow = Math.pow
+
+var DNA;
+const CANVAS_WIDTH = 600;
+const FILTERING = false;
+
 function rad(x){return x * deg2rad}
 function deg(x){return x * rad2deg}
 
@@ -94,10 +99,11 @@ function parseArgs(key2f){
 SEED = (""+(new Date()).getTime())
 parseArgs({seed:function(x){SEED = (x==""?SEED:x)}})
 Math.seed(SEED);
-console.log(SEED)
+console.log('seed', SEED)
 
 
 //perlin noise adapted from p5.js
+
 var Noise = new function(){
   var PERLIN_YWRAPB = 4; var PERLIN_YWRAP = 1<<PERLIN_YWRAPB;
   var PERLIN_ZWRAPB = 8; var PERLIN_ZWRAP = 1<<PERLIN_ZWRAPB;
@@ -105,63 +111,124 @@ var Noise = new function(){
   var perlin_octaves = 4;var perlin_amp_falloff = 0.5;
   var scaled_cosine = function(i) {return 0.5*(1.0-Math.cos(i*Math.PI));};
   var perlin;
-  this.noise = function(x,y,z) {
-    y = y || 0; z = z || 0;
-    if (perlin == null) {
-      perlin = new Array(PERLIN_SIZE + 1);
-      for (var i = 0; i < PERLIN_SIZE + 1; i++) {
-        perlin[i] = Math.random();
-      }
-    }
-    if (x<0) { x=-x; } if (y<0) { y=-y; } if (z<0) { z=-z; }
-    var xi=Math.floor(x), yi=Math.floor(y), zi=Math.floor(z);
-    var xf = x - xi; var yf = y - yi; var zf = z - zi;
-    var rxf, ryf;
-    var r=0; var ampl=0.5;
-    var n1,n2,n3;
-    for (var o=0; o<perlin_octaves; o++) {
-      var of=xi+(yi<<PERLIN_YWRAPB)+(zi<<PERLIN_ZWRAPB);
-      rxf = scaled_cosine(xf); ryf = scaled_cosine(yf);
-      n1  = perlin[of&PERLIN_SIZE];
-      n1 += rxf*(perlin[(of+1)&PERLIN_SIZE]-n1);
-      n2  = perlin[(of+PERLIN_YWRAP)&PERLIN_SIZE];
-      n2 += rxf*(perlin[(of+PERLIN_YWRAP+1)&PERLIN_SIZE]-n2);
-      n1 += ryf*(n2-n1);
-      of += PERLIN_ZWRAP;
-      n2  = perlin[of&PERLIN_SIZE];
-      n2 += rxf*(perlin[(of+1)&PERLIN_SIZE]-n2);
-      n3  = perlin[(of+PERLIN_YWRAP)&PERLIN_SIZE];
-      n3 += rxf*(perlin[(of+PERLIN_YWRAP+1)&PERLIN_SIZE]-n3);
-      n2 += ryf*(n3-n2);
-      n1 += scaled_cosine(zf)*(n2-n1);
-      r += n1*ampl;
-      ampl *= perlin_amp_falloff;
-      xi<<=1; xf*=2; yi<<=1; yf*=2; zi<<=1; zf*=2;
-      if (xf>=1.0) { xi++; xf--; }
-      if (yf>=1.0) { yi++; yf--; }
-      if (zf>=1.0) { zi++; zf--; }
-    }
-    return r;
-  };
-  this.noiseDetail = function(lod, falloff) {
-    if (lod>0)     { perlin_octaves=lod; }
-    if (falloff>0) { perlin_amp_falloff=falloff; }
-  };
-  this.noiseSeed = function(seed) {
-    var lcg = (function() {
-      var m = 4294967296, a = 1664525, c = 1013904223, seed, z;
-      return {
-        setSeed : function(val) {
-          z = seed = (val == null ? Math.random() * m : val) >>> 0;
-        },
-        getSeed : function() {return seed;},
-        rand : function() { z = (a * z + c) % m; return z / m;}
-      };
-    }());
-    lcg.setSeed(seed);
+  // this.noise = quickNoise.noise;
+  
+  this.noise = function(x, y = 0, z = 0) {
+  if (perlin == null) {
     perlin = new Array(PERLIN_SIZE + 1);
-    for (var i = 0; i < PERLIN_SIZE + 1; i++) {perlin[i] = lcg.rand();}
-  };
+    for (let i = 0; i < PERLIN_SIZE + 1; i++) {
+      perlin[i] = Math.random();
+    }
+  }
+
+  if (x < 0) {
+    x = -x;
+  }
+  if (y < 0) {
+    y = -y;
+  }
+  if (z < 0) {
+    z = -z;
+  }
+
+  let xi = Math.floor(x),
+    yi = Math.floor(y),
+    zi = Math.floor(z);
+  let xf = x - xi;
+  let yf = y - yi;
+  let zf = z - zi;
+  let rxf, ryf;
+
+  let r = 0;
+  let ampl = 0.5;
+
+  let n1, n2, n3;
+
+  for (let o = 0; o < perlin_octaves; o++) {
+    let of = xi + (yi << PERLIN_YWRAPB) + (zi << PERLIN_ZWRAPB);
+
+    rxf = scaled_cosine(xf);
+    ryf = scaled_cosine(yf);
+
+    n1 = perlin[of & PERLIN_SIZE];
+    n1 += rxf * (perlin[(of + 1) & PERLIN_SIZE] - n1);
+    n2 = perlin[(of + PERLIN_YWRAP) & PERLIN_SIZE];
+    n2 += rxf * (perlin[(of + PERLIN_YWRAP + 1) & PERLIN_SIZE] - n2);
+    n1 += ryf * (n2 - n1);
+
+    of += PERLIN_ZWRAP;
+    n2 = perlin[of & PERLIN_SIZE];
+    n2 += rxf * (perlin[(of + 1) & PERLIN_SIZE] - n2);
+    n3 = perlin[(of + PERLIN_YWRAP) & PERLIN_SIZE];
+    n3 += rxf * (perlin[(of + PERLIN_YWRAP + 1) & PERLIN_SIZE] - n3);
+    n2 += ryf * (n3 - n2);
+
+    n1 += scaled_cosine(zf) * (n2 - n1);
+
+    r += n1 * ampl;
+    ampl *= perlin_amp_falloff;
+    xi <<= 1;
+    xf *= 2;
+    yi <<= 1;
+    yf *= 2;
+    zi <<= 1;
+    zf *= 2;
+
+    if (xf >= 1.0) {
+      xi++;
+      xf--;
+    }
+    if (yf >= 1.0) {
+      yi++;
+      yf--;
+    }
+    if (zf >= 1.0) {
+      zi++;
+      zf--;
+    }
+  }
+  return r;
+};
+  //function(x,y,z) {
+  //   y = y || 0; z = z || 0;
+  //   if (perlin == null) {
+  //     perlin = new Array(PERLIN_SIZE + 1);
+  //     for (var i = 0; i < PERLIN_SIZE + 1; i++) {
+  //       perlin[i] = Math.random();
+  //     }
+  //   }
+  //   if (x<0) { x=-x; } if (y<0) { y=-y; } if (z<0) { z=-z; }
+  //   var xi=Math.floor(x), yi=Math.floor(y), zi=Math.floor(z);
+  //   var xf = x - xi; var yf = y - yi; var zf = z - zi;
+  //   var rxf, ryf;
+  //   var r=0; var ampl=0.5;
+  //   var n1,n2,n3;
+  //   for (var o=0; o<perlin_octaves; o++) {
+  //     var of=xi+(yi<<PERLIN_YWRAPB)+(zi<<PERLIN_ZWRAPB);
+  //     rxf = scaled_cosine(xf); ryf = scaled_cosine(yf);
+  //     n1  = perlin[of&PERLIN_SIZE];
+  //     n1 += rxf*(perlin[(of+1)&PERLIN_SIZE]-n1);
+  //     n2  = perlin[(of+PERLIN_YWRAP)&PERLIN_SIZE];
+  //     n2 += rxf*(perlin[(of+PERLIN_YWRAP+1)&PERLIN_SIZE]-n2);
+  //     n1 += ryf*(n2-n1);
+  //     of += PERLIN_ZWRAP;
+  //     n2  = perlin[of&PERLIN_SIZE];
+  //     n2 += rxf*(perlin[(of+1)&PERLIN_SIZE]-n2);
+  //     n3  = perlin[(of+PERLIN_YWRAP)&PERLIN_SIZE];
+  //     n3 += rxf*(perlin[(of+PERLIN_YWRAP+1)&PERLIN_SIZE]-n3);
+  //     n2 += ryf*(n3-n2);
+  //     n1 += scaled_cosine(zf)*(n2-n1);
+  //     r += n1*ampl;
+  //     ampl *= perlin_amp_falloff;
+  //     xi<<=1; xf*=2; yi<<=1; yf*=2; zi<<=1; zf*=2;
+  //     if (xf>=1.0) { xi++; xf--; }
+  //     if (yf>=1.0) { yi++; yf--; }
+  //     if (zf>=1.0) { zi++; zf--; }
+  //   }
+  //   return r;
+  // };
+  
+
 }
 // distance between 2 coordinates in 2D
 function distance(p0,p1){
@@ -374,7 +441,7 @@ function polygon(args){
   var xof = (args.xof != undefined) ? args.xof : 0;  
   var yof = (args.yof != undefined) ? args.yof : 0;  
   var pts = (args.pts != undefined) ? args.pts : [];
-  var col = (args.col != undefined) ? args.col : "black";
+  var col = (args.col != undefined) ? args.col : "charcoal";
   var fil = (args.fil != undefined) ? args.fil : true;
   var str = (args.str != undefined) ? args.str : !fil;
 
@@ -439,6 +506,7 @@ function tubify(args){
 }
 // line work with weight function
 function stroke(args){
+  var noiseScale = 10; // 10
   var args = (args != undefined) ? args : {};
   var pts = (args.pts != undefined) ? args.pts : [];
   var ctx = (args.ctx != undefined) ? args.ctx : CTX;
@@ -446,7 +514,7 @@ function stroke(args){
   var yof = (args.yof != undefined) ? args.yof : 0;
   var col = (args.col != undefined) ? args.col : "black";
   var wid = (args.wid != undefined) ? args.wid :
-    (x)=>(1*sin(x*PI)*mapval(Noise.noise(x*10),0,1,0.5,1));
+    (x)=>(1*sin(x*PI)*mapval(Noise.noise(x*noiseScale),0,1,0.5,1));
 
   var [vtxlist0,vtxlist1] = tubify({pts:pts,wid:wid})
 
@@ -462,10 +530,10 @@ function paper(args){
   var spr = (args.spr != undefined) ? args.spr : 1;
 
   var canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 256; //512;
+  canvas.height = 256; //512;
   var ctx = canvas.getContext("2d");
-  var reso = 512
+  var reso = 256;
   for (var i = 0; i < reso/2+1; i++){
     for (var j = 0; j < reso/2+1; j++){
       var c = (255-Noise.noise(i*0.1,j*0.1)*tex*0.5)
@@ -613,6 +681,7 @@ function stem(args){
   }
   var [L,R] = tubify({pts:P,wid:wid})
   var wseg = 4;
+  var noiseScale = 10;
   for (var i = 1; i < P.length; i++){
     for (var j = 1; j < wseg; j++){
       var m = (j-1)/(wseg-1);
@@ -626,9 +695,9 @@ function stem(args){
       var p3 = v3.lerp(L[i],R[i],n)
 
       var lt = n/p
-      var h = lerpHue(col.min[0],col.max[0],lt)*mapval(Noise.noise(p*10,m*10,n*10),0,1,0.5,1)
-      var s = mapval(lt,0,1,col.max[1],col.min[1])*mapval(Noise.noise(p*10,m*10,n*10),0,1,0.5,1)
-      var v = mapval(lt,0,1,col.min[2],col.max[2])*mapval(Noise.noise(p*10,m*10,n*10),0,1,0.5,1)
+      var h = lerpHue(col.min[0],col.max[0],lt)*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+      var s = mapval(lt,0,1,col.max[1],col.min[1])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+      var v = mapval(lt,0,1,col.min[2],col.max[2])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
       var a = mapval(lt,0,1,col.min[3],col.max[3])
 
       polygon({ctx:ctx,pts:[p0,p1,p3,p2],
@@ -639,6 +708,69 @@ function stem(args){
   stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
   stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
   return P
+}
+
+
+function cap(args) {
+  var args =(args != undefined) ? args : {};
+  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
+  var xof = (args.xof != undefined) ? args.xof : 0;  
+  var yof = (args.yof != undefined) ? args.yof : 0;  
+  var rot = (args.rot != undefined) ? args.rot : [PI/2,0,0];
+  var len = (args.len != undefined) ? args.len : 400;
+  var seg = (args.seg != undefined) ? args.seg : 40;
+  var wid = (args.wid != undefined) ? args.wid : (x) => (6);
+  var col = (args.col != undefined) ? args.col : 
+    {min:[250,0.2,0.4,1],max:[250,0.3,0.6,1]}
+  var ben = (args.ben != undefined) ? args.ben : 
+    (x) => ([normRand(-10,10),0,normRand(-5,5)])
+
+    var disp = v3.zero
+    var crot = v3.zero
+    var P = [disp]
+    var ROT = [crot]
+  
+    var orient = (v) => (v3.roteuler(v,rot));
+     
+    for (var i = 0; i < seg; i++){
+      var p = i/(seg-1)
+      crot= v3.add(crot,v3.scale(ben(p),1/seg))
+      disp = v3.add(disp,orient(v3.roteuler([0,0,len/seg],crot)))
+      ROT.push(crot);
+      P.push(disp);
+    }
+    var [L,R] = tubify({pts:P,wid:wid})
+    var wseg = 2;
+    var noiseScale = 5;
+    for (var i = 1; i < P.length; i++){
+      for (var j = 1; j < wseg; j++){
+        var m = (j-1)/(wseg-1);
+        var n = j/(wseg-1);
+        var p = i/(P.length-1)
+  
+        var p0 = v3.lerp(L[i-1],R[i-1],m)
+        var p1 = v3.lerp(L[i],R[i],m)
+  
+        var p2 = v3.lerp(L[i-1],R[i-1],n)
+        var p3 = v3.lerp(L[i],R[i],n)
+  
+        var lt = n/p
+
+        //color
+        var h = lerpHue(col.min[0],col.max[0],lt)*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+        var s = mapval(lt,0,1,col.max[1],col.min[1])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+        var v = mapval(lt,0,1,col.min[2],col.max[2])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+        var a = mapval(lt,0,1,col.min[3],col.max[3])
+  
+
+        polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+          xof:xof,yof:yof,fil:true,str:true,col:hsv(h,s,v,a)})
+      }
+    }
+
+    stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
+    stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
+    return P
 }
 
 // generate fractal-like branches
@@ -676,19 +808,23 @@ function branch(args){
   }
 
   var wfun = function (x) {
+    var noiseScale = 10; // 10
     var [m,j] = jntdist(x)
     if (m < 1){
       return wid*(3+5*(1-x))
     }else{ 
-      return wid*(2+7*(1-x)*mapval(Noise.noise(x*10),0,1,0.5,1))
+      return wid*(2+7*(1-x)*mapval(Noise.noise(x*noiseScale),0,1,0.5,1))
     }
   }
   
+  // BENDING
   var bfun = function (x) {
     var [m,j] = jntdist(x)
     if (m < 1){
+      //this causes bends
       return [0,j*20,0]
     }else{
+      // this slightly bends randomly
       return [0,normRand(-5,5),0]
     }
   }
@@ -726,6 +862,9 @@ function branch(args){
 
 // vizualize parameters into HTML table & canvas
 function vizParams(PAR){
+  if(document.getElementById("summary") == null)
+    return;
+    
   var div = document.createElement("div")
   var viz = ""
   var tabstyle = "style='border: 1px solid grey'"
@@ -764,6 +903,7 @@ function vizParams(PAR){
         if (k.includes("olor")){
           viz += "<td "+tabstyle+">"+"<div style='background-color:"+hsv(...PAR[k][i])
               +"'>&nbsp&nbsp&nbsp&nbsp&nbsp</div></td>"
+          viz += "<td >" +  Color.fromHSLA(PAR[k][i]).humanName + "</td>"
         }
         viz += "</tr>"
       }
@@ -815,8 +955,9 @@ function genParams(){
     [2,randint(3,7),randint(3,8)],
   ])
 
+  var noiseScale = 100; //10
   var flowerShapeNoiseSeed = Math.random()*PI
-  var flowerJaggedness = normRand(0.5,8)
+  var flowerJaggedness = normRand(0.5,8) * noiseScale;
   PAR.flowerShape = (x) => (Noise.noise(x*flowerJaggedness,flowerShapeNoiseSeed)*flowerShapeMask(x))
 
 
@@ -900,10 +1041,16 @@ function genParams(){
   PAR.branchColor = {min:[branchHue,branchSaturation,branchValue,1],
                      max:[branchHue,branchSaturation,branchValue,1]}
 
-  console.log(PAR)
-
+  DNA = PAR;
   vizParams(PAR)
   return PAR
+}
+
+function colors(dna) {
+  var minFlowerColor = getColorName(colortranslator.ColorTranslator.toHEX(hsv(...dna.flowerColor.min)), {list: 'web'}).name
+  var maxFlowerColor = getColorName(colortranslator.ColorTranslator.toHEX(hsv(...dna.flowerColor.max)), {list: 'web'}).name
+
+  return {petals: {min: minFlowerColor, max: maxFlowerColor},}
 }
 
 // generate a woody plant
@@ -1000,11 +1147,11 @@ function woody(args){
       }
     }
   }
-  Layer.filter(lay0,Filter.fade)
-  Layer.filter(lay0,Filter.wispy)
-  Layer.filter(lay1,Filter.wispy)
-  var b1 = Layer.bound(lay0)
-  var b2 = Layer.bound(lay1)
+  
+  doFilters(lay0, lay1);
+
+  var b1 = Layer.boundingBox(lay0)
+  var b2 = Layer.boundingBox(lay1)
   var bd = {
     xmin:Math.min(b1.xmin,b2.xmin),
     xmax:Math.max(b1.xmax,b2.xmax),
@@ -1135,11 +1282,186 @@ function herbal(args){
          ])})
     }
   }
-  Layer.filter(lay0,Filter.fade)
-  Layer.filter(lay0,Filter.wispy)
-  Layer.filter(lay1,Filter.wispy)
-  var b1 = Layer.bound(lay0)
-  var b2 = Layer.bound(lay1)
+
+  doFilters(lay0,lay1);
+
+  var b1 = Layer.boundingBox(lay0)
+  var b2 = Layer.boundingBox(lay1)
+  var bd = {
+    xmin:Math.min(b1.xmin,b2.xmin),
+    xmax:Math.max(b1.xmax,b2.xmax),
+    ymin:Math.min(b1.ymin,b2.ymin),
+    ymax:Math.max(b1.ymax,b2.ymax)
+  }
+  var xref = xof-(bd.xmin+bd.xmax)/2
+  var yref = yof-bd.ymax
+  Layer.blit(ctx,lay0,{ble:"multiply",xof:xref,yof:yref})
+  Layer.blit(ctx,lay1,{ble:"normal",xof:xref,yof:yref})
+
+}
+
+function fungal(args){
+  var args =(args != undefined) ? args : {};
+  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
+  var xof = (args.xof != undefined) ? args.xof : 0;  
+  var yof = (args.yof != undefined) ? args.yof : 0;  
+  var PAR = (args.PAR != undefined) ? args.PAR : genParams();
+
+  var cwid = 1200
+  var lay0 = Layer.empty(cwid)
+  var lay1 = Layer.empty(cwid)
+
+  PAR.branchFork = 0
+  PAR.branchTwist = 1
+  PAR.branchDepth = 0
+  // PAR.branchWidth = 5
+  var PL = branch({
+    ctx:lay0,xof:cwid*0.5,yof:cwid*0.7,
+    wid:PAR.branchWidth,
+    twi:PAR.branchTwist,
+    dep:PAR.branchDepth,
+    len: (Math.random() * 200) + 70,
+    col:PAR.branchColor,
+    seg: 50,
+    frk:PAR.branchFork,
+   })
+   PAR.pedicelLength = 120
+
+  // leaf({ctx:lay0,
+  //   xof:PL[0][1][0].x, yof:PL[0][1][0].y ,    
+  //   len: 20,
+  //   vei:[0,0],
+  //   cof: (x) => (50),
+  //   flo: true, 
+  //   col:PAR.branchColor,
+  //   ben: (x) => ([0,-20,-20]),
+  //   rot:[-10,20,-10], // [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
+  //   wid:(x) => (40)})  
+
+  cap({ctx:lay0,
+    xof:PL[0][1][0].x, yof:PL[0][1][0].y ,
+    rot:[90,0,0],
+    seg: 22,
+    len:PAR.pedicelLength,
+    col:{min:[50,1,0.9,1],max:[50,1,0.9,1]},
+    wid:(x) => (sin(x*PI)*x*200+1),
+    ben:(x) => ([
+        0,0,0
+        ])})
+
+  console.log(PL[0][1][0].x, PL[0][1][0].y)
+
+  for (var i = 0; i < PL.length; i++){
+      for (var j = 1; j > 0; j--){
+        console.log(PL[i][1][j].x, PL[i][1][j].y)
+          // leaf({ctx:lay0,
+          //   xof:PL[i][1][j].x, yof:PL[i][1][j].y - 200,
+          //   len: 20,
+          //   vei:2,
+          //   col:PAR.branchColor,
+          //   rot: [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
+          //   wid:(x) => (205)})                
+
+
+
+          // var hr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0]
+
+          // var P_ = stem({ctx:lay0,
+          //   xof:PL[i][1][j].x, yof:PL[i][1][j].y ,
+          //   rot:hr,
+          //   seg: 32,
+          //   len:PAR.pedicelLength,
+          //   col:{min:[50,1,0.9,1],max:[50,1,0.9,1]},
+          //   wid:(x) => (sin(x*PI)*x*50+1),
+          //   ben:(x) => ([
+          //       200,0,20
+          //      ])})
+
+          
+
+      }
+  }
+
+  doFilters(lay0,lay1);
+
+  var b1 = Layer.boundingBox(lay0)
+  var b2 = Layer.boundingBox(lay1)
+  var bd = {
+    xmin:Math.min(b1.xmin,b2.xmin),
+    xmax:Math.max(b1.xmax,b2.xmax),
+    ymin:Math.min(b1.ymin,b2.ymin),
+    ymax:Math.max(b1.ymax,b2.ymax)
+  }
+  var xref = xof-(bd.xmin+bd.xmax)/2
+  var yref = yof-bd.ymax
+  Layer.blit(ctx,lay0,{ble:"multiply",xof:xref,yof:yref})
+  Layer.blit(ctx,lay1,{ble:"normal",xof:xref,yof:yref})
+
+}
+
+function sprig(args){
+  var args =(args != undefined) ? args : {};
+  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
+  var xof = (args.xof != undefined) ? args.xof : 0;  
+  var yof = (args.yof != undefined) ? args.yof : 0;  
+  var PAR = (args.PAR != undefined) ? args.PAR : genParams();
+
+  var cwid = 1200
+  var lay0 = Layer.empty(cwid)
+  var lay1 = Layer.empty(cwid)
+
+  PAR.branchFork = 0.0
+  PAR.branchTwist = 0.01
+  PAR.branchDepth = 0.01
+  var PL = branch({
+    ctx:lay0,xof:cwid*0.5,yof:cwid*0.7,
+    wid:PAR.branchWidth,
+    twi:PAR.branchTwist,
+    dep:PAR.branchDepth,
+    col:PAR.branchColor,
+    frk:PAR.branchFork,
+   })
+
+  for (var i = 0; i < PL.length; i++){
+      for (var j = 0; j < PL[i][1].length; j++){
+          leaf({ctx:lay0,
+            xof:PL[i][1][j].x, yof:PL[i][1][j].y,
+            len:PAR.leafLength *normRand(0.8,1.2),
+            vei:PAR.leafType,
+            col:PAR.leafColor,
+            rot:[normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
+            wid:(x) => (PAR.leafShape(x)*PAR.leafWidth),
+            ben:(x) => ([
+              mapval(Noise.noise(x*1,i),0,1,-1,1)*5,
+              0,
+              mapval(Noise.noise(x*1,i+PI),0,1,-1,1)*5
+             ])})                
+
+
+        if (Math.random() < PAR.flowerChance){
+
+          var hr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0]
+
+          var P_ = stem({ctx:lay0,
+            xof:PL[i][1][j].x, yof:PL[i][1][j].y,
+            rot:hr,
+            len:PAR.pedicelLength,
+            col:{min:[50,1,0.9,1],max:[50,1,0.9,1]},
+            wid:(x) => (sin(x*PI)*x*2+1),
+            ben:(x) => ([
+                0,0,0
+               ])})
+
+          
+
+        }
+      }
+  }
+
+  doFilters(lay0,lay1);
+
+  var b1 = Layer.boundingBox(lay0)
+  var b2 = Layer.boundingBox(lay1)
   var bd = {
     xmin:Math.min(b1.xmin,b2.xmin),
     xmax:Math.max(b1.xmax,b2.xmax),
@@ -1168,7 +1490,7 @@ var Filter = new function(){
 // canvas context operations
 var Layer = new function(){
   this.empty = function(w,h){
-    w = (w != undefined) ? w : 600;
+    w = (w != undefined) ? w : CANVAS_WIDTH;
     h = (h != undefined) ? h : w;
     var canvas = document.createElement('canvas');
     canvas.width = w;
@@ -1189,7 +1511,13 @@ var Layer = new function(){
       ctx.canvas.width, ctx.canvas.height);
     var pix = imgd.data;
     for (var i = 0, n = pix.length; i < n; i += 4) {
-      var [r,g,b,a] = pix.slice(i,i+4)
+      // var [r,g,b,a] = pix.slice(i,i+4)
+      var r = pix[i];
+      var g = pix[i+1];
+      var b = pix[i+2];
+      var a = pix[i+3];
+
+
       var x = (i/4)%(ctx.canvas.width)
       var y = Math.floor((i/4)/(ctx.canvas.width))
       var [r1,g1,b1,a1] = f(x,y,r,g,b,a)
@@ -1205,7 +1533,11 @@ var Layer = new function(){
       ctx.canvas.width, ctx.canvas.height);
     var pix = imgd.data;
     for (var i = 0, n = pix.length; i < n; i += 4) {
-      var [r,g,b,a] = pix.slice(i,i+4)
+      // var [r,g,b,a] = pix.slice(i,i+4)
+      var r = pix[i];
+      var g = pix[i+1];
+      var b = pix[i+2];
+      var a = pix[i+3];
       var x = (i/4)%(ctx.canvas.width)
       var y = Math.floor((i/4)/(ctx.canvas.width))
 
@@ -1224,28 +1556,35 @@ var Layer = new function(){
     }
     ctx.putImageData(imgd, 0, 0);
   }
-  // find the dirty region - potentially optimizable
-  this.bound = function(ctx){
-    var xmin = ctx.canvas.width
-    var xmax = 0
-    var ymin = ctx.canvas.height
-    var ymax = 0
-    var imgd = ctx.getImageData(0, 0, 
-      ctx.canvas.width, ctx.canvas.height);
-    var pix = imgd.data;
-    for (var i = 0, n = pix.length; i < n; i += 4) {
-      var [r,g,b,a] = pix.slice(i,i+4)
-      var x = (i/4)%(ctx.canvas.width)
-      var y = Math.floor((i/4)/(ctx.canvas.width))
-      if (a > 0.001){
-        if (x < xmin){xmin = x}
-        if (x > xmax){xmax = x}
-        if (y < ymin){ymin = y}
-        if (y > ymax){ymax = y}
-      }
+  this.boundingBox = function(ctx,alphaThreshold){
+    if (alphaThreshold===undefined) alphaThreshold = 15;
+    var w=ctx.canvas.width,h=ctx.canvas.height;
+    var data = ctx.getImageData(0,0,w,h).data;
+
+    let minX=w;
+    let maxX=0
+    let minY=h
+    let maxY=0
+    for(let y=0; y<h; y++)
+    {
+        for(let x=0; x<w; x++)
+        {
+            if (data[y*w*4 + x*4+3])
+            {
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                minY = Math.min(minY, y);
+                maxY = y;
+                x=maxX
+            }
+        }
     }
-    return {xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax}
-  }
+
+    // return {x:minX,y:minY,maxX:maxX,maxY:maxY,w:maxX-minX,h:maxY-minY};
+    return {xmin:minY,xmax:maxX,ymin:minY,ymax:maxY};
+
+}
+
 }
 
 CTX = Layer.empty();
@@ -1297,24 +1636,34 @@ function makeBG(){
   }
 }
 
+function doFilters(layer0, layer1) {
+  if(FILTERING) {
+      Layer.filter(lay0,Filter.fade)
+      Layer.filter(lay0,Filter.wispy)
+      Layer.filter(lay1,Filter.wispy)
+  }
+}
+
 // generate new plant
-function generate(){
+function generate(plantType){
   CTX = Layer.empty();
   CTX.fillStyle ="white"
   CTX.fillRect(0,0,CTX.canvas.width,CTX.canvas.height)
-  //document.body.appendChild(CTX.canvas)
-  var ppr = paper({col:PAPER_COL1})
-  // for (var i = 0; i < CTX.canvas.width; i+= 512){
-  //   for (var j = 0; j < CTX.canvas.height; j+= 512){
-  //     //CTX.drawImage(ppr,i,j);
-  //   }
-  // }
-  if (Math.random() <= 0.5){
-    woody({ctx:CTX,xof:300,yof:550,})
-  }else{
-    herbal({ctx:CTX,xof:300,yof:600,})
+
+  console.log('generating...')
+  var plantType =(plantType !== undefined) ? plantType : ["flower", "woody", "fungus"].sort(() => 0.5 - Math.random())[0];
+
+  switch(plantType){
+    case "flower":
+      herbal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,})
+      break;
+    case "woody":
+      woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
+      break;
+    case "fungus":
+      fungal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
+      break;
   }
-  // Layer.border(CTX,squircle(0.98,3))
 }
 
 // reload page with given seed
@@ -1329,6 +1678,7 @@ function load(){
   setTimeout(_load,100)
   function _load(){
     generate()
+    displayName()
     document.getElementById("canvas-container").appendChild(CTX.canvas)
     document.getElementById("loader").style.display = "none";
     document.getElementById("content").style.display = "block";
@@ -1338,7 +1688,25 @@ function load(){
       +window.location.href
       +"&amp;text="+window.location.href+";hashtags=nonflowers";
   }  
+
+  function displayName() {
+    var plant = new Plant(DNA);
+    var flowerDiv = document.getElementById("flower-name");
+    var h5 = document.createElement("h4");
+    h5.className = "text-center"
+
+    h5.innerHTML = plant.name;
+            //Math.seed(seed); 
+    var minFlowerColor = plant.flowerColors[0]
+    var maxFlowerColor = plant.flowerColors[1]
+    var description = document.createElement("p");
+    description.className = "text-center"
+    
+    description.innerHTML = [...new Set( [minFlowerColor, maxFlowerColor])].join( " to ") + " flowers";
+
+    flowerDiv.appendChild(h5);
+    flowerDiv.appendChild(description);
+  }
+
+
 }
-
-
-
