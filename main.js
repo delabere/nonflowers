@@ -441,9 +441,10 @@ function polygon(args){
   var xof = (args.xof != undefined) ? args.xof : 0;  
   var yof = (args.yof != undefined) ? args.yof : 0;  
   var pts = (args.pts != undefined) ? args.pts : [];
-  var col = (args.col != undefined) ? args.col : "charcoal";
+  var col = (args.col != undefined) ? args.col : rgba(54,69,79,1);
   var fil = (args.fil != undefined) ? args.fil : true;
   var str = (args.str != undefined) ? args.str : !fil;
+  var lineWidth = (args.lineWidth != undefined) ? args.lineWidth : 0.2;
 
   ctx.beginPath();
   if (pts.length > 0){
@@ -457,6 +458,8 @@ function polygon(args){
     ctx.fill();
   }
   if (str){
+    ctx.lineWidth = lineWidth;
+    ctx.lineJoin = "round";
     ctx.strokeStyle = col;
     ctx.stroke();
   }
@@ -523,39 +526,39 @@ function stroke(args){
   return [vtxlist0,vtxlist1]
 }
 // generate paper texture
-function paper(args){
-  var args =(args != undefined) ? args : {};
-  var col = (args.col != undefined) ? args.col : [0.98,0.91,0.74];
-  var tex = (args.tex != undefined) ? args.tex : 1;
-  var spr = (args.spr != undefined) ? args.spr : 1;
+// function paper(args){
+//   var args =(args != undefined) ? args : {};
+//   var col = (args.col != undefined) ? args.col : [0.98,0.91,0.74];
+//   var tex = (args.tex != undefined) ? args.tex : 1;
+//   var spr = (args.spr != undefined) ? args.spr : 1;
 
-  var canvas = document.createElement("canvas");
-  canvas.width = 256; //512;
-  canvas.height = 256; //512;
-  var ctx = canvas.getContext("2d");
-  var reso = 256;
-  for (var i = 0; i < reso/2+1; i++){
-    for (var j = 0; j < reso/2+1; j++){
-      var c = (255-Noise.noise(i*0.1,j*0.1)*tex*0.5)
-      c -= Math.random()*tex;
-      var r = (c*col[0])
-      var g = (c*col[1])
-      var b = (c*col[2])
-      if (Noise.noise(i*0.04,j*0.04,2)*Math.random()*spr>0.7 
-       || Math.random()<0.005*spr){
-        var r = (c*0.7)
-        var g = (c*0.5)
-        var b = (c*0.2)
-      }
-      ctx.fillStyle = rgba(r,g,b);
-      ctx.fillRect(i,j,1,1);
-      ctx.fillRect(reso-i,j,1,1);
-      ctx.fillRect(i,reso-j,1,1);
-      ctx.fillRect(reso-i,reso-j,1,1);
-    }
-  }
-  return canvas
-}
+//   var canvas = document.createElement("canvas");
+//   canvas.width = 256; //512;
+//   canvas.height = 256; //512;
+//   var ctx = canvas.getContext("2d");
+//   var reso = 256;
+//   for (var i = 0; i < reso/2+1; i++){
+//     for (var j = 0; j < reso/2+1; j++){
+//       var c = (255-Noise.noise(i*0.1,j*0.1)*tex*0.5)
+//       c -= Math.random()*tex;
+//       var r = (c*col[0])
+//       var g = (c*col[1])
+//       var b = (c*col[2])
+//       if (Noise.noise(i*0.04,j*0.04,2)*Math.random()*spr>0.7 
+//        || Math.random()<0.005*spr){
+//         var r = (c*0.7)
+//         var g = (c*0.5)
+//         var b = (c*0.2)
+//       }
+//       ctx.fillStyle = rgba(r,g,b);
+//       ctx.fillRect(i,j,1,1);
+//       ctx.fillRect(reso-i,j,1,1);
+//       ctx.fillRect(i,reso-j,1,1);
+//       ctx.fillRect(reso-i,reso-j,1,1);
+//     }
+//   }
+//   return canvas
+// }
 // generate leaf-like structure
 function leaf(args){
   var args =(args != undefined) ? args : {};
@@ -1645,25 +1648,34 @@ function doFilters(layer0, layer1) {
 }
 
 // generate new plant
+var plant;
 function generate(plantType){
   CTX = Layer.empty();
-  CTX.fillStyle ="white"
+  CTX.fillStyle =rgba(255,255,255,0);
   CTX.fillRect(0,0,CTX.canvas.width,CTX.canvas.height)
 
-  console.log('generating...')
-  var plantType =(plantType !== undefined) ? plantType : ["flower", "woody", "fungus"].sort(() => 0.5 - Math.random())[0];
+
+  var plantType =(plantType !== undefined && plantType !== null) ? plantType : ["flower", "woody", "fungus"].sort(() => 0.5 - Math.random())[0];
+  console.log('generating...', plantType)
 
   switch(plantType){
     case "flower":
       herbal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,})
+      plant = new Flowering(DNA);
       break;
     case "woody":
       woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
+      plant = new Woody(DNA);
       break;
     case "fungus":
       fungal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
+      plant = new Fungus(DNA);
       break;
+    default:
+      herbal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,})
+      plant = new Flowering(DNA);
   }
+
 }
 
 // reload page with given seed
@@ -1677,7 +1689,9 @@ function load(){
   makeBG()
   setTimeout(_load,100)
   function _load(){
-    generate()
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString)
+    generate(urlParams.get('plantType'))
     displayName()
     document.getElementById("canvas-container").appendChild(CTX.canvas)
     document.getElementById("loader").style.display = "none";
@@ -1690,7 +1704,6 @@ function load(){
   }  
 
   function displayName() {
-    var plant = new Plant(DNA);
     var flowerDiv = document.getElementById("flower-name");
     var h5 = document.createElement("h4");
     h5.className = "text-center"
