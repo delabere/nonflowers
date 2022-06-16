@@ -71,7 +71,6 @@ class Plant {
     position(layer0, layer1, xExtra = 0, yExtra = 0) {
         var b1 = Layer.boundingBox(layer0)
         var b2 = Layer.boundingBox(layer1)
-        console.log(b1, b2)
         var bd = {
             xmin:Math.min(b1.xmin,b2.xmin),
             xmax:Math.max(b1.xmax,b2.xmax),
@@ -87,8 +86,8 @@ class Plant {
         var xref = (bd.cWidth/2 - boundingWidth/2) - (this.xof -  boundingWidth/2)
         var yref = (bd.cHeight/2 - boundingHeight/2) - bd.ymin/2
 
-        Layer.blit(this.ctx,layer0,{ble:"multiply",xof:xref + xExtra,yof:yref + yExtra})
-        Layer.blit(this.ctx,layer1,{ble:"normal",xof:xref + xExtra,yof:yref + yExtra})
+        Layer.blit(this.ctx,layer0,{ble:"normal",xof:xref + xExtra,yof:yref + yExtra})
+        Layer.blit(this.ctx,layer1,{ble:"hard-light",xof:xref + xExtra,yof:yref + yExtra})
 
     }
      

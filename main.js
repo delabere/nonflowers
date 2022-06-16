@@ -105,7 +105,7 @@ function newSeed() {
   console.log('seed', SEED)
   return SEED;
 }
-newSeed();
+// newSeed();
 
 //perlin noise adapted from p5.js
 
@@ -930,21 +930,21 @@ function vizParams(PAR){
   viz += "</td></tr><tr><td align='left' "+tabstyle+"></td></tr></table>"
   var graphs = document.createElement("div")
   graphs.className = "row";
-  for (var k in PAR){
-    if (typeof(PAR[k]) == "function"){
-      var lay = Layer.empty(100, 100)
-      lay.fillStyle ="charcoal"
-      for (var i = 0; i < 100; i++){
-        lay.fillRect(i,100-100*PAR[k](i/100,0.5),2,2)
-      }
-      lay.fillText(k,2,10);
-      lay.canvas.style = "border: 1px solid grey"
-      var graph = document.createElement("div")
-      graph.className ="col-md-2"
-      graph.appendChild(lay.canvas)
-      graphs.appendChild(graph)
-    }
-  }
+  // for (var k in PAR){
+  //   if (typeof(PAR[k]) == "function"){
+  //     var lay = Layer.empty(100, 100)
+  //     lay.fillStyle ="charcoal"
+  //     for (var i = 0; i < 100; i++){
+  //       lay.fillRect(i,100-100*PAR[k](i/100,0.5),2,2)
+  //     }
+  //     lay.fillText(k,2,10);
+  //     lay.canvas.style = "border: 1px solid grey"
+  //     var graph = document.createElement("div")
+  //     graph.className ="col-md-2"
+  //     graph.appendChild(lay.canvas)
+  //     graphs.appendChild(graph)
+  //   }
+  // }
   div.innerHTML += viz
   div.lastChild.lastChild.lastChild.lastChild.appendChild(graphs)
   document.getElementById("summary").appendChild(div)
@@ -965,16 +965,32 @@ var Filter = new function(){
   }
 }
 
+function createCanvas(w,h) {
+  var canvas = document.createElement('canvas');
+  // if (typeof OffscreenCanvas !== "undefined") {
+  //   var offscreenCanvas = new OffscreenCanvas(w,h);
+  // // } else {
+  //   canvas.width = w;
+  //   canvas.height = h;
+  // }
+  // var offscreenCanvas =
+  // 'OffscreenCanvas' in window
+  //   ? canvas.transferControlToOffscreen()
+  //   : canvas; 
+  //   canvas.style = {width: w, height: h};
+    canvas.width = w;
+    canvas.height = h;
+  return canvas.getContext('2d');
+  
+}
 // canvas context operations
 var Layer = new function(){
   this.empty = function(w,h){
+    console.log(w, w != undefined, CANVAS_WIDTH)
     w = (w != undefined) ? w : CANVAS_WIDTH;
     h = (h != undefined) ? h : CANVAS_HEIGHT;
-    var canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    context = canvas.getContext('2d');
-    return context
+    console.log(w,h)
+    return createCanvas(w,h)
   }
   this.blit = function(ctx0,ctx1,args){
     var args =(args != undefined) ? args : {};
@@ -1048,7 +1064,7 @@ var Layer = new function(){
   }
 }
 
-CTX = Layer.empty();
+// CTX = Layer.empty();
 var BGCANV;
 
 PAPER_COL0 = [1,1,1]//[1,0.99,0.9]
@@ -1061,7 +1077,11 @@ function makeDownload(){
   down.addEventListener('click', function() {
     var ctx = Layer.empty()
     ctx.drawImage(CTX.canvas,0,0)
-    this.href = ctx.canvas.toDataURL();
+    // this.href = ctx.canvas.toDataURL();
+    var scope = this
+    ctx.canvas.convertToBlob().then( blob => {
+      scope.href = blob;
+    });
     this.download = SEED + "- " + plant.name;
   }, false);
   document.body.appendChild(down);
@@ -1178,3 +1198,4 @@ function load(){
 
 
 }
+
