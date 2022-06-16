@@ -1,21 +1,31 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Flora of Verilin</title>
     <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/0cf67825f6.js" crossorigin="anonymous"></script>
     <script src="node_modules/named-web-colors/lib/named-web-colors.js"></script>
     <script src="node_modules/colortranslator/dist/web/colortranslator.js"></script>
     <script src="main.js"></script>
-    <script src="classes/plant.js"></script>
     <script src="classes/color.js"></script>
+    <script src="classes/dna.js"></script>
+    <script src="classes/plant.js"></script>
     <script src="classes/flowering.js"></script>
     <script src="classes/woody.js"></script>
     <script src="classes/fungus.js"></script>
+    <script src="classes/descriptors/descriptor.js"></script>
+    <script src="classes/descriptors/colorRangeDescriptor.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&display=swap" rel="stylesheet">
-  
+    <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&family=Share&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" type="text/css" href="style.css">
-    <title>Nonflowers</title>
     <style>
       body {
           font-family: 'Kristi', cursive;
@@ -31,75 +41,73 @@
           font-family: 'Loved by the King', cursive;
           font-size: 1.2em;
        }
+       table {
+        font-family: 'Share', cursive;
+       }
+       #canvas-container {
+        /* border: 1px solid; */
+       }
       </style>
   </head>
   <body onload="load()">
     
-    <div id="loader">
-      <div id="spinner">
-
+    <div class="position-absolute top-50 start-50 translate-middle" id="loader">
+      <div id="spinner" class="text-center">
+        <i class="fa-3x fa-duotone fa-hand-holding-seedling fa-beat" style="--fa-beat-scale: 1.3; --fa-animation-duration: 2s;"></i>
+        <div id="load-text" class="ps-1 pt-4">Generating...&nbsp;&nbsp;&nbsp;</div>
       </div>
-      <div id="load-text">Generating...&nbsp;&nbsp;&nbsp;</div>
     </div>
 
-    <div style="display:none;" id="content" class="emerge" >
-      <div><br></div>
-      <div id="canvas-container"></div>
-      <div><br></div>
-      <div id="flower-name">
-
+    <div id="content"  >
+      <div class="col-md-12 d-flex justify-content-center">
+        <div id="canvas-container" class=" d-flex justify-content-center"></div>
       </div>
-      <table align="center" style="width:600px; ">
-        <tr><td align="right">
-          <div id="options" class="option-bar">
-            <i class="material-icons button" onclick="location.reload()">refresh</i>
-            <i class="material-icons button" onclick="makeDownload()">file_download</i>
-            <i class="material-icons button" onclick="toggle('summary','block')">list</i>
-            <i class="material-icons button" onclick="toggle('settings','table')">settings</i>
-            <i class="material-icons button" onclick="toggle('share','table')">share</i>
-          </div>
-        </td><tr>
-        
-        <tr><td>
-          <div id="summary" style="display:none" class="emerge"></div>
-        </td></tr>
 
-        <tr><td align="right">
-          <div id="settings" style="display:none" class="emerge">
-            <p>Seed: <input title="random seed" id="inp-seed"/></p>
-            <p align="center">
-              <button onclick="reloadWSeed(document.getElementById('inp-seed').value)">
-                Generate
-              </button>
-            </p>
-          </div>
-        </td></tr>
+      <div class="d-flex justify-content-center">
+        <div id="flower-name"></div>
+      </div>
 
-        <tr><td align="right">
-          <div id="share" style="display:none" class="emerge">
-            <a id="share-twitter" target="_blank">
-              Twitter
-            </a>
-          </div>
-        </td></tr>
+      <div class="d-flex justify-content-center">
+        <div class="col-md-4">
+          <table class="table table-sm table-borderless">
+            <tr><td align="right">
+                <div id="options" class="option-bar">
+                  <i class="fa-solid fa-arrows-rotate btn" onclick="location.reload()"></i>
+                  <i class="fa-solid fa-download btn" onclick="makeDownload()"></i>
+                  <i class="fa-solid fa-dna btn" onclick="toggle('summary','block')"></i>
+                  <i class="fa-duotone fa-seedling btn" onclick="toggle('settings','table')"></i>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>  
 
+      
+      <div class="d-flex justify-content-center">     
+        <table id="options-table" class="table table-sm ">
+          <tr><td>
+            <div id="summary" class="d-block" ></div>
+          </td></tr>
 
-      </table>
+          <tr><td align="right">
+
+            <div id="settings" class="">
+              <div class="card">
+                <div class="card-body">
+              <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Seed</span>
+                <input title="random seed" class="form-control" id="inp-seed"/>
+                <button type="button" class="btn btn-outline-secondary" onclick="reloadWSeed(document.getElementById('inp-seed').value)">Generate</button>
+              </div>
+
+              </div>
+              </div>
+            </div>
+          </td></tr>
+        </table>
+      </div>
     </div>
-    <svg xmlns="http://www.w3.org/2000/svg">
-      <filter id="x-rays" x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-          <feColorMatrix type="matrix" values="1 0 0 0 0
-      1 0 0 0 0
-      1 0 0 0 0
-      0 0 0 1 0" in="SourceGraphic" result="colormatrix"/>
-          <feComponentTransfer in="colormatrix" result="componentTransfer">
-                  <feFuncR type="table" tableValues="0.98 0.3 0.25"/>
-              <feFuncG type="table" tableValues="1 0.44 0.24"/>
-              <feFuncB type="table" tableValues="0.91 0.62 0.39"/>
-              <feFuncA type="table" tableValues="0 0.9"/>
-            </feComponentTransfer>
-          <feBlend mode="overlay" in="componentTransfer" in2="SourceGraphic" result="blend"/>
-      </filter>
-      </svg> 
+
   </body>
 </html>

@@ -35,8 +35,9 @@ var cos = Math.cos
 var abs = Math.abs
 var pow = Math.pow
 
-var DNA;
-const CANVAS_WIDTH = 600;
+var CANVAS_WIDTH;
+var CANVAS_HEIGHT;
+
 const FILTERING = false;
 
 function rad(x){return x * deg2rad}
@@ -96,11 +97,15 @@ function parseArgs(key2f){
     }
   }
 }
-SEED = (""+(new Date()).getTime())
-parseArgs({seed:function(x){SEED = (x==""?SEED:x)}})
-Math.seed(SEED);
-console.log('seed', SEED)
 
+function newSeed() {
+  SEED = (""+(new Date()).getTime())
+  parseArgs({seed:function(x){SEED = (x==""?SEED:x)}})
+  Math.seed(SEED);
+  console.log('seed', SEED)
+  return SEED;
+}
+newSeed();
 
 //perlin noise adapted from p5.js
 
@@ -668,6 +673,9 @@ function stem(args){
   var ben = (args.ben != undefined) ? args.ben : 
     (x) => ([normRand(-10,10),0,normRand(-5,5)])
 
+
+  // console.log(xof, yof, rot, len, seg, wid, col, ben)
+
   var disp = v3.zero
   var crot = v3.zero
   var P = [disp]
@@ -870,8 +878,8 @@ function vizParams(PAR){
     
   var div = document.createElement("div")
   var viz = ""
-  var tabstyle = "style='border: 1px solid grey'"
-  viz += "<table><tr><td "+tabstyle+">Summary</td></tr><tr><td "+tabstyle+"><table><tr>"
+  var tabstyle = ""
+  viz += "<table class='table table-sm table-bordered'><tr><td "+tabstyle+">Summary</td></tr><tr><td "+tabstyle+"><table class='table table-sm table-bordered'><tr>"
   var cnt = 0
   for (var k in PAR){
     if (typeof(PAR[k]) == "number"){
@@ -887,19 +895,19 @@ function vizParams(PAR){
     if (typeof(a) == "number"){
       return a.toFixed(3)
     }else if (typeof(a)=="object"){
-      var r = "<table><tr>"
+      var r = "<table class='table table-sm table-bordered'><tr>"
       for (var k in a){
         r += "<td "+tabstyle+">"+fmt(a[k])+"</td>"
       }
       return r+"</tr></table>"
     }
   }
-  viz += "<table><tr>"
+  viz += "<table class='table table-sm  table-borderless'><tr>"
   cnt = 0
   for (var k in PAR){
     if (typeof(PAR[k]) == "object"){
 
-      viz += "<td "+tabstyle+"><table><tr><td colspan='2' "+tabstyle+">"+k+"</td></tr>"
+      viz += "<td "+tabstyle+"><table class='table table-sm table-bordered'><tr><td colspan='2' "+tabstyle+">"+k+"</td></tr>"
       
       for (var i in PAR[k]){
         viz += "<tr><td "+tabstyle+">"+i+"</td><td "+tabstyle+">"+fmt(PAR[k][i])+"</td>"
@@ -921,19 +929,22 @@ function vizParams(PAR){
   viz += "</tr></table>"
   viz += "</td></tr><tr><td align='left' "+tabstyle+"></td></tr></table>"
   var graphs = document.createElement("div")
+  graphs.className = "row";
   for (var k in PAR){
     if (typeof(PAR[k]) == "function"){
-      var lay = Layer.empty(100)
-      lay.fillStyle ="silver"
+      var lay = Layer.empty(100, 100)
+      lay.fillStyle ="charcoal"
       for (var i = 0; i < 100; i++){
         lay.fillRect(i,100-100*PAR[k](i/100,0.5),2,2)
       }
       lay.fillText(k,2,10);
       lay.canvas.style = "border: 1px solid grey"
-      graphs.appendChild(lay.canvas)
+      var graph = document.createElement("div")
+      graph.className ="col-md-2"
+      graph.appendChild(lay.canvas)
+      graphs.appendChild(graph)
     }
   }
-  //console.log(viz)
   div.innerHTML += viz
   div.lastChild.lastChild.lastChild.lastChild.appendChild(graphs)
   document.getElementById("summary").appendChild(div)
@@ -942,113 +953,6 @@ function vizParams(PAR){
 }
 
 // generate random parameters
-function genParams(){
-  var randint = (x,y) => (Math.floor(normRand(x,y)))
-
-  var PAR = {}
-  
-  var flowerShapeMask = (x) => (pow(sin(PI*x),0.2))
-  var leafShapeMask = (x) => (pow(sin(PI*x),0.5))
-
-  PAR.flowerChance = randChoice([normRand(0,0.08),normRand(0,0.03)])
-  PAR.leafChance = randChoice([0, normRand(0,0.1), normRand(0,0.1)])
-  PAR.leafType = randChoice([
-    [1,randint(2,5)],
-    [2,randint(3,7),randint(3,8)],
-    [2,randint(3,7),randint(3,8)],
-  ])
-
-  var noiseScale = 100; //10
-  var flowerShapeNoiseSeed = Math.random()*PI
-  var flowerJaggedness = normRand(0.5,8) * noiseScale;
-  PAR.flowerShape = (x) => (Noise.noise(x*flowerJaggedness,flowerShapeNoiseSeed)*flowerShapeMask(x))
-
-
-  var leafShapeNoiseSeed = Math.random()*PI
-  var leafJaggedness = normRand(0.1,40)
-  var leafPointyness = normRand(0.5,1.5)
-  PAR.leafShape = randChoice([
-    (x) => (Noise.noise(x*leafJaggedness,flowerShapeNoiseSeed)*leafShapeMask(x)),
-    (x) => (pow(sin(PI*x),leafPointyness))
-  ])
-
-  var flowerHue0 = (normRand(0,180)-130+360)%360
-  var flowerHue1 = Math.floor((flowerHue0 + normRand(-70,70) + 360)%360)
-  var flowerValue0 = Math.min(1,normRand(0.5,1.3))
-  var flowerValue1 = Math.min(1,normRand(0.5,1.3))
-  var flowerSaturation0 = normRand(0,1.1-flowerValue0)
-  var flowerSaturation1 = normRand(0,1.1-flowerValue1)
-
-  PAR.flowerColor = {min:[flowerHue0,flowerSaturation0,flowerValue0,normRand(0.8,1)],
-                     max:[flowerHue1,flowerSaturation1,flowerValue1,normRand(0.5,1)]}
-  PAR.leafColor = {min:[normRand(10,200),normRand(0.05,0.4),normRand(0.3,0.7),normRand(0.8,1)],
-                   max:[normRand(10,200),normRand(0.05,0.4),normRand(0.3,0.7),normRand(0.8,1)]}
-
-  var curveCoeff0 = [normRand(-0.5,0.5),normRand(5,10)]
-  var curveCoeff1 = [Math.random()*PI, normRand(1,5)]
-
-  var curveCoeff2 = [Math.random()*PI,normRand(5,15)]
-  var curveCoeff3 = [Math.random()*PI,normRand(1,5)]
-  var curveCoeff4 = [Math.random()*0.5,normRand(0.8,1.2)]
-
-  PAR.flowerOpenCurve = randChoice([
-    (x,op) => (
-      (x < 0.1) ? 
-        2+op*curveCoeff2[1]
-      : Noise.noise(x*10,curveCoeff2[0])),
-    (x,op) => (
-      (x < curveCoeff4[0]) ? 0 : 10-x*mapval(op,0,1,16,20)*curveCoeff4[1]
-    )
-  ])
- 
-  PAR.flowerColorCurve = randChoice([
-      (x)=>(sigmoid(x+curveCoeff0[0],curveCoeff0[1])),
-      //(x)=>(Noise.noise(x*curveCoeff1[1],curveCoeff1[0]))
-  ])
-  PAR.leafLength = normRand(30,100)
-  PAR.flowerLength = normRand(5,55) //* (0.1-PAR.flowerChance)*10
-  PAR.pedicelLength = normRand(5,30)
-
-  PAR.leafWidth = normRand(5,30)
-
-  PAR.flowerWidth = normRand(5,30)
-
-  PAR.stemWidth = normRand(2,11)
-  PAR.stemBend = normRand(2,16)
-  PAR.stemLength = normRand(300,400)
-  PAR.stemCount = randChoice([2,3,4,5])
-
-  PAR.sheathLength = randChoice([0,normRand(50,100)])
-  PAR.sheathWidth = normRand(5,15)
-  PAR.shootCount = normRand(1,7)
-  PAR.shootLength = normRand(50,180)
-  PAR.leafPosition = randChoice([1,2])
-
-  PAR.flowerPetal = Math.round(mapval(PAR.flowerWidth,5,50,10,3))
-
-  PAR.innerLength = Math.min(normRand(0,20),PAR.flowerLength*0.8)
-  PAR.innerWidth = Math.min(randChoice([0,normRand(1,8)]),PAR.flowerWidth*0.8)
-  PAR.innerShape = (x) => (pow(sin(PI*x),1))
-  var innerHue = normRand(0,60)
-  PAR.innerColor = {min:[innerHue,normRand(0.1,0.7),normRand(0.5,0.9),normRand(0.8,1)],
-                    max:[innerHue,normRand(0.1,0.7),normRand(0.5,0.9),normRand(0.5,1)]}
-  
-  PAR.branchWidth = normRand(0.4,1.3)
-  PAR.branchTwist = Math.round(normRand(2,5))
-  PAR.branchDepth = randChoice([3,4])
-  PAR.branchFork = randChoice([4,5,6,7])
-
-  var branchHue = normRand(30,60)
-  var branchSaturation = normRand(0.05,0.3)
-  var branchValue = normRand(0.7,0.9)
-  PAR.branchColor = {min:[branchHue,branchSaturation,branchValue,1],
-                     max:[branchHue,branchSaturation,branchValue,1]}
-
-  DNA = PAR;
-  vizParams(PAR)
-  return PAR
-}
-
 function colors(dna) {
   var minFlowerColor = getColorName(colortranslator.ColorTranslator.toHEX(hsv(...dna.flowerColor.min)), {list: 'web'}).name
   var maxFlowerColor = getColorName(colortranslator.ColorTranslator.toHEX(hsv(...dna.flowerColor.max)), {list: 'web'}).name
@@ -1056,427 +960,6 @@ function colors(dna) {
   return {petals: {min: minFlowerColor, max: maxFlowerColor},}
 }
 
-// generate a woody plant
-function woody(args){
-  var args =(args != undefined) ? args : {};
-  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
-  var xof = (args.xof != undefined) ? args.xof : 0;  
-  var yof = (args.yof != undefined) ? args.yof : 0;  
-  var PAR = (args.PAR != undefined) ? args.PAR : genParams();
-
-  var cwid = 1200
-  var lay0 = Layer.empty(cwid)
-  var lay1 = Layer.empty(cwid)
-
-  var PL = branch({
-    ctx:lay0,xof:cwid*0.5,yof:cwid*0.7,
-    wid:PAR.branchWidth,
-    twi:PAR.branchTwist,
-    dep:PAR.branchDepth,
-    col:PAR.branchColor,
-    frk:PAR.branchFork,
-   })
-
-  for (var i = 0; i < PL.length; i++){
-    if (i/PL.length > 0.1){
-      for (var j = 0; j < PL[i][1].length; j++){
-        if (Math.random() < PAR.leafChance){
-          leaf({ctx:lay0,
-            xof:PL[i][1][j].x, yof:PL[i][1][j].y,
-            len:PAR.leafLength *normRand(0.8,1.2),
-            vei:PAR.leafType,
-            col:PAR.leafColor,
-            rot:[normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
-            wid:(x) => (PAR.leafShape(x)*PAR.leafWidth),
-            ben:(x) => ([
-              mapval(Noise.noise(x*1,i),0,1,-1,1)*5,
-              0,
-              mapval(Noise.noise(x*1,i+PI),0,1,-1,1)*5
-             ])})                
-        }
-
-
-        if (Math.random() < PAR.flowerChance){
-
-          var hr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0]
-
-          var P_ = stem({ctx:lay0,
-            xof:PL[i][1][j].x, yof:PL[i][1][j].y,
-            rot:hr,
-            len:PAR.pedicelLength,
-            col:{min:[50,1,0.9,1],max:[50,1,0.9,1]},
-            wid:(x) => (sin(x*PI)*x*2+1),
-            ben:(x) => ([
-                0,0,0
-               ])})
-
-          var op = Math.random()
-          
-          var r = grot(P_,-1)
-          var hhr = r
-          for (var k = 0; k < PAR.flowerPetal; k++){
-
-            leaf({ctx:lay1,flo:true,
-              xof:PL[i][1][j].x+P_[-1].x, yof:PL[i][1][j].y+P_[-1].y,
-              rot:[hhr[0],hhr[1],hhr[2]+k/PAR.flowerPetal*PI*2],
-              len:PAR.flowerLength *normRand(0.7,1.3),
-              wid:(x) => ( PAR.flowerShape(x)*PAR.flowerWidth ),
-              vei:[0],
-              col:PAR.flowerColor,
-              cof:PAR.flowerColorCurve,
-              ben:(x) => ([
-                PAR.flowerOpenCurve(x,op),
-                0,
-                0,
-               ])
-             })
-
-            leaf({ctx:lay1,flo:true,
-              xof:PL[i][1][j].x+P_[-1].x, yof:PL[i][1][j].y+P_[-1].y,
-              rot:[hhr[0],hhr[1],hhr[2]+k/PAR.flowerPetal*PI*2],
-              len:PAR.innerLength *normRand(0.8,1.2),
-              wid:(x) => ( sin(x*PI)*4 ),
-              vei:[0],
-              col:PAR.innerColor,
-              cof:(x) => (x),
-              ben:(x) => ([
-                PAR.flowerOpenCurve(x,op),
-                0,
-                0,
-               ])})
-
-          }
-        }
-      }
-    }
-  }
-  
-  doFilters(lay0, lay1);
-
-  var b1 = Layer.boundingBox(lay0)
-  var b2 = Layer.boundingBox(lay1)
-  var bd = {
-    xmin:Math.min(b1.xmin,b2.xmin),
-    xmax:Math.max(b1.xmax,b2.xmax),
-    ymin:Math.min(b1.ymin,b2.ymin),
-    ymax:Math.max(b1.ymax,b2.ymax)
-  }
-  var xref = xof-(bd.xmin+bd.xmax)/2
-  var yref = yof-bd.ymax
-  Layer.blit(ctx,lay0,{ble:"multiply",xof:xref,yof:yref})
-  Layer.blit(ctx,lay1,{ble:"normal",xof:xref,yof:yref})
-
-}
-
-// generate a herbaceous plant
-function herbal(args){
-  var args =(args != undefined) ? args : {};
-  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
-  var xof = (args.xof != undefined) ? args.xof : 0;  
-  var yof = (args.yof != undefined) ? args.yof : 0;
-  var PAR = (args.PAR != undefined) ? args.PAR : genParams();
-
-  var cwid = 1200
-  var lay0 = Layer.empty(cwid)
-  var lay1 = Layer.empty(cwid)
-
-  var x0 = cwid*0.5
-  var y0 = cwid*0.7
-    
-  for (var i = 0; i < PAR.stemCount; i++){
-    var r = [PI/2,0,normRand(-1,1)*PI]
-    var P = stem({ctx:lay0,xof:x0,yof:y0,
-      len:PAR.stemLength*normRand(0.7,1.3),
-      rot:r,
-      wid:(x) => (PAR.stemWidth*
-        (pow(sin(x*PI/2+PI/2),0.5)*Noise.noise(x*10)*0.5+0.5)),
-      ben:(x) => ([
-          mapval(Noise.noise(x*1,i),0,1,-1,1)*x*PAR.stemBend,
-          0,
-          mapval(Noise.noise(x*1,i+PI),0,1,-1,1)*x*PAR.stemBend,
-         ])})
-    
-
-    if (PAR.leafPosition == 2){
-      for (var j = 0; j < P.length; j++)
-        if (Math.random() < PAR.leafChance*2){
-          leaf({ctx:lay0,
-            xof:x0+P[j].x, yof:y0+P[j].y,
-            len:2*PAR.leafLength *normRand(0.8,1.2),
-            vei:PAR.leafType,
-            col:PAR.leafColor,
-            rot:[normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
-            wid:(x) => (2*PAR.leafShape(x)*PAR.leafWidth),
-            ben:(x) => ([
-              mapval(Noise.noise(x*1,i),0,1,-1,1)*5,
-              0,
-              mapval(Noise.noise(x*1,i+PI),0,1,-1,1)*5
-             ])})                
-        }      
-    }
-
-
-    var hr = grot(P,-1)
-    if (PAR.sheathLength != 0){
-      stem({ctx:lay0,xof:x0+P[-1].x,yof:y0+P[-1].y,
-        rot:hr,
-        len:PAR.sheathLength,
-        col:{min:[60,0.3,0.9,1],max:[60,0.3,0.9,1]},
-        wid:(x) => PAR.sheathWidth*(pow(sin(x*PI),2)-x*0.5+0.5),
-        ben:(x) => ([0,0,0]
-           )})
-    }
-    for (var j = 0; j < Math.max(1,PAR.shootCount*normRand(0.5,1.5)); j++){
-      var P_ = stem({ctx:lay0,xof:x0+P[-1].x,yof:y0+P[-1].y,
-      rot:hr,
-      len:PAR.shootLength*normRand(0.5,1.5),
-      col:{min:[70,0.2,0.9,1],max:[70,0.2,0.9,1]},
-      wid:(x) => (2),
-      ben:(x) => ([
-          mapval(Noise.noise(x*1,j),0,1,-1,1)*x*10,
-          0,
-          mapval(Noise.noise(x*1,j+PI),0,1,-1,1)*x*10
-         ])})
-      var op = Math.random()
-      var hhr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*PI]
-      for (var k = 0; k < PAR.flowerPetal; k++){
-        leaf({ctx:lay1,flo:true,
-          xof:x0+P[-1].x+P_[-1].x, yof:y0+P[-1].y+P_[-1].y,
-          rot:[hhr[0],hhr[1],hhr[2]+k/PAR.flowerPetal*PI*2],
-          len:PAR.flowerLength *normRand(0.7,1.3)*1.5,
-          wid:(x) => ( 1.5*PAR.flowerShape(x)*PAR.flowerWidth ),
-          vei:[0],
-          col:PAR.flowerColor,
-          cof:PAR.flowerColorCurve,
-          ben:(x) => ([
-            PAR.flowerOpenCurve(x,op),
-            0,
-            0,
-           ])})
-
-        leaf({ctx:lay1,flo:true,
-          xof:x0+P[-1].x+P_[-1].x, yof:y0+P[-1].y+P_[-1].y,
-          rot:[hhr[0],hhr[1],hhr[2]+k/PAR.flowerPetal*PI*2],
-          len:PAR.innerLength *normRand(0.8,1.2),
-          wid:(x) => ( sin(x*PI)*4 ),
-          vei:[0],
-          col:PAR.innerColor,
-          cof:(x) => (x),
-          ben:(x) => ([
-            PAR.flowerOpenCurve(x,op),
-            0,
-            0,
-           ])})
-      }
-    }
-
-  }
-  if (PAR.leafPosition == 1){
-    for (var i = 0; i < PAR.leafChance*100; i++){
-      leaf({ctx:lay0,
-        xof:x0,yof:y0,rot:[PI/3,0,normRand(-1,1)*PI],
-        len: 4*PAR.leafLength *normRand(0.8,1.2),
-        wid:(x) => (2*PAR.leafShape(x)*PAR.leafWidth),
-        vei:PAR.leafType,
-        ben:(x) => ([
-          mapval(Noise.noise(x*1,i),0,1,-1,1)*10,
-          0,
-          mapval(Noise.noise(x*1,i+PI),0,1,-1,1)*10
-         ])})
-    }
-  }
-
-  doFilters(lay0,lay1);
-
-  var b1 = Layer.boundingBox(lay0)
-  var b2 = Layer.boundingBox(lay1)
-  var bd = {
-    xmin:Math.min(b1.xmin,b2.xmin),
-    xmax:Math.max(b1.xmax,b2.xmax),
-    ymin:Math.min(b1.ymin,b2.ymin),
-    ymax:Math.max(b1.ymax,b2.ymax)
-  }
-  var xref = xof-(bd.xmin+bd.xmax)/2
-  var yref = yof-bd.ymax
-  Layer.blit(ctx,lay0,{ble:"multiply",xof:xref,yof:yref})
-  Layer.blit(ctx,lay1,{ble:"normal",xof:xref,yof:yref})
-
-}
-
-function fungal(args){
-  var args =(args != undefined) ? args : {};
-  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
-  var xof = (args.xof != undefined) ? args.xof : 0;  
-  var yof = (args.yof != undefined) ? args.yof : 0;  
-  var PAR = (args.PAR != undefined) ? args.PAR : genParams();
-
-  var cwid = 1200
-  var lay0 = Layer.empty(cwid)
-  var lay1 = Layer.empty(cwid)
-
-  PAR.branchFork = 0
-  PAR.branchTwist = 1
-  PAR.branchDepth = 0
-  // PAR.branchWidth = 5
-  var PL = branch({
-    ctx:lay0,xof:cwid*0.5,yof:cwid*0.7,
-    wid:PAR.branchWidth,
-    twi:PAR.branchTwist,
-    dep:PAR.branchDepth,
-    len: (Math.random() * 200) + 70,
-    col:PAR.branchColor,
-    seg: 50,
-    frk:PAR.branchFork,
-   })
-   PAR.pedicelLength = 120
-
-  // leaf({ctx:lay0,
-  //   xof:PL[0][1][0].x, yof:PL[0][1][0].y ,    
-  //   len: 20,
-  //   vei:[0,0],
-  //   cof: (x) => (50),
-  //   flo: true, 
-  //   col:PAR.branchColor,
-  //   ben: (x) => ([0,-20,-20]),
-  //   rot:[-10,20,-10], // [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
-  //   wid:(x) => (40)})  
-
-  cap({ctx:lay0,
-    xof:PL[0][1][0].x, yof:PL[0][1][0].y ,
-    rot:[90,0,0],
-    seg: 22,
-    len:PAR.pedicelLength,
-    col:{min:[50,1,0.9,1],max:[50,1,0.9,1]},
-    wid:(x) => (sin(x*PI)*x*200+1),
-    ben:(x) => ([
-        0,0,0
-        ])})
-
-  console.log(PL[0][1][0].x, PL[0][1][0].y)
-
-  for (var i = 0; i < PL.length; i++){
-      for (var j = 1; j > 0; j--){
-        console.log(PL[i][1][j].x, PL[i][1][j].y)
-          // leaf({ctx:lay0,
-          //   xof:PL[i][1][j].x, yof:PL[i][1][j].y - 200,
-          //   len: 20,
-          //   vei:2,
-          //   col:PAR.branchColor,
-          //   rot: [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
-          //   wid:(x) => (205)})                
-
-
-
-          // var hr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0]
-
-          // var P_ = stem({ctx:lay0,
-          //   xof:PL[i][1][j].x, yof:PL[i][1][j].y ,
-          //   rot:hr,
-          //   seg: 32,
-          //   len:PAR.pedicelLength,
-          //   col:{min:[50,1,0.9,1],max:[50,1,0.9,1]},
-          //   wid:(x) => (sin(x*PI)*x*50+1),
-          //   ben:(x) => ([
-          //       200,0,20
-          //      ])})
-
-          
-
-      }
-  }
-
-  doFilters(lay0,lay1);
-
-  var b1 = Layer.boundingBox(lay0)
-  var b2 = Layer.boundingBox(lay1)
-  var bd = {
-    xmin:Math.min(b1.xmin,b2.xmin),
-    xmax:Math.max(b1.xmax,b2.xmax),
-    ymin:Math.min(b1.ymin,b2.ymin),
-    ymax:Math.max(b1.ymax,b2.ymax)
-  }
-  var xref = xof-(bd.xmin+bd.xmax)/2
-  var yref = yof-bd.ymax
-  Layer.blit(ctx,lay0,{ble:"multiply",xof:xref,yof:yref})
-  Layer.blit(ctx,lay1,{ble:"normal",xof:xref,yof:yref})
-
-}
-
-function sprig(args){
-  var args =(args != undefined) ? args : {};
-  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
-  var xof = (args.xof != undefined) ? args.xof : 0;  
-  var yof = (args.yof != undefined) ? args.yof : 0;  
-  var PAR = (args.PAR != undefined) ? args.PAR : genParams();
-
-  var cwid = 1200
-  var lay0 = Layer.empty(cwid)
-  var lay1 = Layer.empty(cwid)
-
-  PAR.branchFork = 0.0
-  PAR.branchTwist = 0.01
-  PAR.branchDepth = 0.01
-  var PL = branch({
-    ctx:lay0,xof:cwid*0.5,yof:cwid*0.7,
-    wid:PAR.branchWidth,
-    twi:PAR.branchTwist,
-    dep:PAR.branchDepth,
-    col:PAR.branchColor,
-    frk:PAR.branchFork,
-   })
-
-  for (var i = 0; i < PL.length; i++){
-      for (var j = 0; j < PL[i][1].length; j++){
-          leaf({ctx:lay0,
-            xof:PL[i][1][j].x, yof:PL[i][1][j].y,
-            len:PAR.leafLength *normRand(0.8,1.2),
-            vei:PAR.leafType,
-            col:PAR.leafColor,
-            rot:[normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
-            wid:(x) => (PAR.leafShape(x)*PAR.leafWidth),
-            ben:(x) => ([
-              mapval(Noise.noise(x*1,i),0,1,-1,1)*5,
-              0,
-              mapval(Noise.noise(x*1,i+PI),0,1,-1,1)*5
-             ])})                
-
-
-        if (Math.random() < PAR.flowerChance){
-
-          var hr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0]
-
-          var P_ = stem({ctx:lay0,
-            xof:PL[i][1][j].x, yof:PL[i][1][j].y,
-            rot:hr,
-            len:PAR.pedicelLength,
-            col:{min:[50,1,0.9,1],max:[50,1,0.9,1]},
-            wid:(x) => (sin(x*PI)*x*2+1),
-            ben:(x) => ([
-                0,0,0
-               ])})
-
-          
-
-        }
-      }
-  }
-
-  doFilters(lay0,lay1);
-
-  var b1 = Layer.boundingBox(lay0)
-  var b2 = Layer.boundingBox(lay1)
-  var bd = {
-    xmin:Math.min(b1.xmin,b2.xmin),
-    xmax:Math.max(b1.xmax,b2.xmax),
-    ymin:Math.min(b1.ymin,b2.ymin),
-    ymax:Math.max(b1.ymax,b2.ymax)
-  }
-  var xref = xof-(bd.xmin+bd.xmax)/2
-  var yref = yof-bd.ymax
-  Layer.blit(ctx,lay0,{ble:"multiply",xof:xref,yof:yref})
-  Layer.blit(ctx,lay1,{ble:"normal",xof:xref,yof:yref})
-
-}
 // collection of image filters
 var Filter = new function(){
   this.wispy = function(x,y,r,g,b,a){
@@ -1494,7 +977,7 @@ var Filter = new function(){
 var Layer = new function(){
   this.empty = function(w,h){
     w = (w != undefined) ? w : CANVAS_WIDTH;
-    h = (h != undefined) ? h : w;
+    h = (h != undefined) ? h : CANVAS_HEIGHT;
     var canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
@@ -1563,31 +1046,14 @@ var Layer = new function(){
     if (alphaThreshold===undefined) alphaThreshold = 15;
     var w=ctx.canvas.width,h=ctx.canvas.height;
     var data = ctx.getImageData(0,0,w,h).data;
-
-    let minX=w;
-    let maxX=0
-    let minY=h
-    let maxY=0
-    for(let y=0; y<h; y++)
-    {
-        for(let x=0; x<w; x++)
-        {
-            if (data[y*w*4 + x*4+3])
-            {
-                minX = Math.min(minX, x);
-                maxX = Math.max(maxX, x);
-                minY = Math.min(minY, y);
-                maxY = y;
-                x=maxX
-            }
-        }
-    }
-
-    // return {x:minX,y:minY,maxX:maxX,maxY:maxY,w:maxX-minX,h:maxY-minY};
+    var x,y,minX,minY,maxY,maxY;
+    o1: for (y=h;y--;)        for (x=w;x--;)           if (data[(w*y+x)*4+3]>alphaThreshold){ maxY=y; break o1 }
+    if (!maxY) return;
+    o2: for (x=w;x--;)        for (y=maxY+1;y--;)      if (data[(w*y+x)*4+3]>alphaThreshold){ maxX=x; break o2 }
+    o3: for (x=0;x<=maxX;++x) for (y=maxY+1;y--;)      if (data[(w*y+x)*4+3]>alphaThreshold){ minX=x; break o3 }
+    o4: for (y=0;y<=maxY;++y) for (x=minX;x<=maxX;++x) if (data[(w*y+x)*4+3]>alphaThreshold){ minY=y; break o4 }
     return {xmin:minY,xmax:maxX,ymin:minY,ymax:maxY};
-
-}
-
+  }
 }
 
 CTX = Layer.empty();
@@ -1602,14 +1068,9 @@ function makeDownload(){
   down.innerHTML = "[Download]"
   down.addEventListener('click', function() {
     var ctx = Layer.empty()
-    for (var i = 0; i < ctx.canvas.width; i+= 512){
-      for (var j = 0; j < ctx.canvas.height; j+= 512){
-        ctx.drawImage(BGCANV,i,j);
-      }
-    }
     ctx.drawImage(CTX.canvas,0,0)
     this.href = ctx.canvas.toDataURL();
-    this.download = SEED;
+    this.download = SEED + "- " + plant.name;
   }, false);
   document.body.appendChild(down);
   down.click()
@@ -1618,8 +1079,9 @@ function makeDownload(){
 
 // toggle visibility of sub menus
 function toggle(x,disp){
+  document.getElementById("options-table").className = "d-block";
   disp = (disp != undefined) ? disp : "block"
-  var alle = ["summary","settings","share"]
+  var alle = ["summary","settings"]
   var d = document.getElementById(x).style.display;
   for (var i = 0; i < alle.length; i++){
     document.getElementById(alle[i]).style.display = "none"
@@ -1633,92 +1095,95 @@ function toggle(x,disp){
 function makeBG(){
   setTimeout(_makeBG,10)
   function _makeBG(){
-    BGCANV = paper({col:PAPER_COL0,tex:0,spr:0})
+    BGCANV = ''
+    // paper({col:PAPER_COL0,tex:0,spr:0})
     //var img = BGCANV.toDataURL("image/png");
     //document.body.style.backgroundImage = 'url('+img+')';
   }
 }
 
-function doFilters(layer0, layer1) {
-  if(FILTERING) {
-      Layer.filter(lay0,Filter.fade)
-      Layer.filter(lay0,Filter.wispy)
-      Layer.filter(lay1,Filter.wispy)
-  }
-}
+
 
 // generate new plant
 var plant;
 function generate(plantType){
+  newSeed();
+
+  // CANVAS_WIDTH = (document.body.clientWidth < 1200) ? document.body.clientWidth : 300;
+  // CANVAS_HEIGHT = Math.floor(window.innerHeight * 0.75);
+  CANVAS_WIDTH = 704;
+  CANVAS_HEIGHT = 863//Math.floor(window.innerHeight * 0.75);
   CTX = Layer.empty();
   CTX.fillStyle =rgba(255,255,255,0);
   CTX.fillRect(0,0,CTX.canvas.width,CTX.canvas.height)
-
 
   var plantType =(plantType !== undefined && plantType !== null) ? plantType : ["flower", "woody", "fungus"].sort(() => 0.5 - Math.random())[0];
   console.log('generating...', plantType)
 
   switch(plantType){
-    case "flower":
-      herbal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,})
-      plant = new Flowering(DNA);
+    case "flowering":
+      // herbal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,})
+      plant = new Flowering({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,});
       break;
     case "woody":
-      woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
-      plant = new Woody(DNA);
+      // woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
+      plant = new Woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_HEIGHT - 50,});
       break;
     case "fungus":
-      fungal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
-      plant = new Fungus(DNA);
+      plant = new Fungus({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,});
       break;
     default:
-      herbal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,})
-      plant = new Flowering(DNA);
+      plant = new Flowering({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,});
   }
 
+  plant.generate();
 }
 
 // reload page with given seed
 function reloadWSeed(s){
   var u = window.location.href.split("?")[0]
-  window.location.href = u + "?seed=" + s;
+  window.location.href = u + "?seed=" + s + "&plantType=" + plant.type;
 }
 
+function getPlantType() {
+  var queryString = window.location.search;
+  var urlParams = new URLSearchParams(queryString)
+  return urlParams.get('plantType')
+}
 // initialize everything
 function load(){
+
   makeBG()
   setTimeout(_load,100)
   function _load(){
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString)
-    generate(urlParams.get('plantType'))
+    generate(getPlantType())
+    vizParams(plant.genes)
     displayName()
     document.getElementById("canvas-container").appendChild(CTX.canvas)
     document.getElementById("loader").style.display = "none";
     document.getElementById("content").style.display = "block";
     document.getElementById("inp-seed").value = SEED;
-    document.getElementById("share-twitter").href=
-      "https://twitter.com/share?url="
-      +window.location.href
-      +"&amp;text="+window.location.href+";hashtags=nonflowers";
+    // document.getElementById("share-twitter").href=
+    //   "https://twitter.com/share?url="
+    //   +window.location.href
+    //   +"&amp;text="+window.location.href+";hashtags=nonflowers";
   }  
 
   function displayName() {
     var flowerDiv = document.getElementById("flower-name");
     var h5 = document.createElement("h4");
-    h5.className = "text-center"
-
-    h5.innerHTML = plant.name;
-            //Math.seed(seed); 
-    var minFlowerColor = plant.flowerColors[0]
-    var maxFlowerColor = plant.flowerColors[1]
-    var description = document.createElement("p");
-    description.className = "text-center"
-    
-    description.innerHTML = [...new Set( [minFlowerColor, maxFlowerColor])].join( " to ") + " flowers";
+        h5.className = "text-center"
+        h5.innerHTML = plant.name;
 
     flowerDiv.appendChild(h5);
-    flowerDiv.appendChild(description);
+
+    Object.entries(plant.description).map(obj => {
+      var description = document.createElement("p");
+      description.className = "text-left my-0";
+      description.innerHTML = obj.reverse().join(" ")// [1] + obj[0];
+      flowerDiv.appendChild(description);
+    })
+
   }
 
 
