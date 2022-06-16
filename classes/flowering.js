@@ -50,7 +50,7 @@ class Flowering extends Plant {
             if (this.genes.leafPosition == 2){
             for (var j = 0; j < P.length; j++)
                 if (Math.random() < this.genes.leafChance*2){
-                leaf({ctx:lay0,
+                this.leaf({ctx:lay0,
                     xof:x0+P[j].x, yof:y0+P[j].y,
                     len:2*this.genes.leafLength *normRand(0.8,1.2),
                     vei:this.genes.leafType,
@@ -90,7 +90,7 @@ class Flowering extends Plant {
             var op = Math.random()
             var hhr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*PI]
             for (var k = 0; k < this.genes.flowerPetal; k++){
-                leaf({ctx:lay1,flo:true,
+                this.leaf({ctx:lay1,flo:true,
                 xof:x0+P[-1].x+P_[-1].x, yof:y0+P[-1].y+P_[-1].y,
                 rot:[hhr[0],hhr[1],hhr[2]+k/this.genes.flowerPetal*PI*2],
                 len:this.genes.flowerLength *normRand(0.7,1.3)*1.5,
@@ -104,7 +104,7 @@ class Flowering extends Plant {
                     0,
                     ])})
         
-                leaf({ctx:lay1,flo:true,
+                this.leaf({ctx:lay1,flo:true,
                 xof:x0+P[-1].x+P_[-1].x, yof:y0+P[-1].y+P_[-1].y,
                 rot:[hhr[0],hhr[1],hhr[2]+k/this.genes.flowerPetal*PI*2],
                 len:this.genes.innerLength *normRand(0.8,1.2),
@@ -123,7 +123,7 @@ class Flowering extends Plant {
         }
         if (this.genes.leafPosition == 1){
             for (var i = 0; i < this.genes.leafChance*100; i++){
-            leaf({ctx:lay0,
+            this.leaf({ctx:lay0,
                 xof:x0,yof:y0,rot:[PI/3,0,normRand(-1,1)*PI],
                 len: 4*this.genes.leafLength *normRand(0.8,1.2),
                 wid:(x) => (2*this.genes.leafShape(x)*this.genes.leafWidth),

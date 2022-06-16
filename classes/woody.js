@@ -32,7 +32,7 @@ class Woody extends Plant {
           if (i/PL.length > 0.1){
             for (var j = 0; j < PL[i][1].length; j++){
               if (Math.random() < this.genes.leafChance){
-                leaf({ctx:lay0,
+                this.leaf({ctx:lay0,
                   xof:PL[i][1][j].x, yof:PL[i][1][j].y,
                   len:this.genes.leafLength *normRand(0.8,1.2),
                   vei:this.genes.leafType,
@@ -67,7 +67,7 @@ class Woody extends Plant {
                 var hhr = r
                 for (var k = 0; k < this.genes.flowerPetal; k++){
       
-                  leaf({ctx:lay1,flo:true,
+                  this.leaf({ctx:lay1,flo:true,
                     xof:PL[i][1][j].x+P_[-1].x, yof:PL[i][1][j].y+P_[-1].y,
                     rot:[hhr[0],hhr[1],hhr[2]+k/this.genes.flowerPetal*PI*2],
                     len:this.genes.flowerLength *normRand(0.7,1.3),
@@ -82,7 +82,7 @@ class Woody extends Plant {
                      ])
                    })
       
-                  leaf({ctx:lay1,flo:true,
+                  this.leaf({ctx:lay1,flo:true,
                     xof:PL[i][1][j].x+P_[-1].x, yof:PL[i][1][j].y+P_[-1].y,
                     rot:[hhr[0],hhr[1],hhr[2]+k/this.genes.flowerPetal*PI*2],
                     len:this.genes.innerLength *normRand(0.8,1.2),
