@@ -1038,13 +1038,13 @@ var Layer = new function(){
     if (alphaThreshold===undefined) alphaThreshold = 15;
     var w=ctx.canvas.width,h=ctx.canvas.height;
     var data = ctx.getImageData(0,0,w,h).data;
-    var x,y,minX,minY,maxY,maxY=0;
+    var x,y,minX,minY,maxY,maxY;
     o1: for (y=h;y--;)        for (x=w;x--;)           if (data[(w*y+x)*4+3]>alphaThreshold){ maxY=y; break o1 }
-    if (!maxY) return;
+    if (!maxY) return {xmin:0,xmax:w,ymin:0,ymax:h};
     o2: for (x=w;x--;)        for (y=maxY+1;y--;)      if (data[(w*y+x)*4+3]>alphaThreshold){ maxX=x; break o2 }
     o3: for (x=0;x<=maxX;++x) for (y=maxY+1;y--;)      if (data[(w*y+x)*4+3]>alphaThreshold){ minX=x; break o3 }
     o4: for (y=0;y<=maxY;++y) for (x=minX;x<=maxX;++x) if (data[(w*y+x)*4+3]>alphaThreshold){ minY=y; break o4 }
-    return {xmin:minY,xmax:maxX,ymin:minY,ymax:maxY};
+    return {xmin:minX,xmax:maxX,ymin:minY,ymax:maxY};
   }
 }
 
@@ -1109,16 +1109,14 @@ function generate(plantType){
   CTX.fillStyle =rgba(255,255,255,0);
   CTX.fillRect(0,0,CTX.canvas.width,CTX.canvas.height)
 
-  var plantType =(plantType !== undefined && plantType !== null) ? plantType : ["flower", "woody", "fungus"].sort(() => 0.5 - Math.random())[0];
+  var plantType =(plantType !== undefined && plantType !== null) ? plantType : ["flower", "woody"].sort(() => 0.5 - Math.random())[0];
   console.log('generating...', plantType)
 
   switch(plantType){
     case "flowering":
-      // herbal({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,})
       plant = new Flowering({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,});
       break;
     case "woody":
-      // woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,})
       plant = new Woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_HEIGHT - 50,});
       break;
     case "fungus":

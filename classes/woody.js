@@ -13,10 +13,11 @@ class Woody extends Plant {
         var args =(this.args != undefined) ? this.args : {};
       
         var cwid = this.ctx.canvas.width
-        var lay0 = Layer.empty(cwid)
-        var lay1 = Layer.empty(cwid)
+        var cheight = this.ctx.canvas.height
+        var lay0 = Layer.empty(cwid, cheight)
+        var lay1 = Layer.empty(cwid, cheight)
         var x0 = cwid*0.5
-        var y0 = cwid*0.99
+        var y0 = cheight*0.99
              
         var PL = branch({
           ctx:lay0,xof:x0,yof:y0,

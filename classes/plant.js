@@ -71,6 +71,7 @@ class Plant {
     position(layer0, layer1, xExtra = 0, yExtra = 0) {
         var b1 = Layer.boundingBox(layer0)
         var b2 = Layer.boundingBox(layer1)
+        console.log(b1, b2)
         var bd = {
             xmin:Math.min(b1.xmin,b2.xmin),
             xmax:Math.max(b1.xmax,b2.xmax),
