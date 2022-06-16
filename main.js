@@ -952,14 +952,6 @@ function vizParams(PAR){
 
 }
 
-// generate random parameters
-function colors(dna) {
-  var minFlowerColor = getColorName(colortranslator.ColorTranslator.toHEX(hsv(...dna.flowerColor.min)), {list: 'web'}).name
-  var maxFlowerColor = getColorName(colortranslator.ColorTranslator.toHEX(hsv(...dna.flowerColor.max)), {list: 'web'}).name
-
-  return {petals: {min: minFlowerColor, max: maxFlowerColor},}
-}
-
 // collection of image filters
 var Filter = new function(){
   this.wispy = function(x,y,r,g,b,a){

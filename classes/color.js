@@ -1,5 +1,5 @@
 class Color {
-    constructor(colorStr, colorSpace = 'web') {
+    constructor(colorStr, colorSpace = 'werner') {
 
         this.colorStr = colorStr;
         this.colorSpace = colorSpace;
@@ -8,7 +8,7 @@ class Color {
 
     // color = hsv(...this.colorStr))
     get humanName() {
-        return getColorName( colortranslator.ColorTranslator.toHEX(this.colorStr, {list: this.colorSpace})).name;
+        return getColorName( colortranslator.ColorTranslator.toHEX(this.colorStr), {list: this.colorSpace}).name;
     }
 
     static fromHSLA(arr) {
