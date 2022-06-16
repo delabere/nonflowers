@@ -4,6 +4,8 @@ A rewritten, optimized and controllable deriviation of the brilliant https://lin
 
 I wanted to have a botanical catalog of plants that could be tied to a procedurally generated world. 
 
+[Play with it here](https://esmarkowski.github.io/nonflowers/catalog?plantType=flowers)
+
 ### Flowering
 ![flora_of_verilin_flowers-sized-saturated2](https://user-images.githubusercontent.com/4501/174100130-186b6583-641f-48f1-a289-972be3f025e8.png)
 
