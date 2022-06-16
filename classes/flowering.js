@@ -30,7 +30,6 @@ class Flowering extends Plant {
         
         var x0 = cwid*0.5;
         var y0 = cheight*0.9; 
-        console.log(x0, y0)
             
         for (var i = 0; i < this.genes.stemCount; i++){
             var r = [PI/2,0,normRand(-1,1)*PI]

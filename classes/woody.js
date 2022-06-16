@@ -103,7 +103,7 @@ class Woody extends Plant {
         
         this.addFilters(lay0,lay1);
 
-        this.position(lay0,lay1);
+        this.position(lay0,lay1, 0, 0);     
       }
 
 }

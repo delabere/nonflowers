@@ -1046,7 +1046,7 @@ var Layer = new function(){
     if (alphaThreshold===undefined) alphaThreshold = 15;
     var w=ctx.canvas.width,h=ctx.canvas.height;
     var data = ctx.getImageData(0,0,w,h).data;
-    var x,y,minX,minY,maxY,maxY;
+    var x,y,minX,minY,maxY,maxY=0;
     o1: for (y=h;y--;)        for (x=w;x--;)           if (data[(w*y+x)*4+3]>alphaThreshold){ maxY=y; break o1 }
     if (!maxY) return;
     o2: for (x=w;x--;)        for (y=maxY+1;y--;)      if (data[(w*y+x)*4+3]>alphaThreshold){ maxX=x; break o2 }

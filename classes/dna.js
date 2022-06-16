@@ -42,7 +42,7 @@ class DNA {
                            max:[flowerHue1,flowerSaturation1,flowerValue1,normRand(0.5,1)]}
 
 
-        var saturationWeight = 0.5;
+        var saturationWeight = 0.2;
 
         PAR.flowerColor.min[1] = clamp(PAR.flowerColor.min[1] + saturationWeight, 0, 1);
         PAR.flowerColor.max[1] = clamp(PAR.flowerColor.max[1] + saturationWeight, 0, 1);;
