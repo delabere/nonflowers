@@ -1,4 +1,4 @@
-# Nonflowers
+# Naniflowers
 
 A rewritten, optimized and controllable deriviation of the brilliant https://lingdong-.github.io/nonflowers/. 
 
