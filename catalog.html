@@ -10,7 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&family=Share&display=swap" rel="stylesheet"> 
+    <script src="https://kit.fontawesome.com/0cf67825f6.js" crossorigin="anonymous"></script>
     <!-- Include name that color library -->
     <script src="./node_modules/named-web-colors/lib/named-web-colors.js"></script>
     <script src="./node_modules/colortranslator/dist/web/colortranslator.js"></script>
@@ -29,7 +30,10 @@
             color: #7A7658;
             /* background-color: #FFFFFA; */
         }
-
+        #load-text {
+        text-align: center;
+  font-family: 'Share', cursive;
+        }
 
         .title h1 { 
             font-size: 4em;
@@ -63,7 +67,14 @@
         }
     </style>
 </head>
-<body>
+<body onload="catalog()">
+
+    <div class="position-absolute top-50 start-50 translate-middle" id="loader">
+        <div id="spinner" class="text-center">
+          <i class="fa-3x fa-duotone fa-hand-holding-seedling fa-beat" style="--fa-beat-scale: 1.3; --fa-animation-duration: 2s;"></i>
+          <div id="load-text" class="ps-1 pt-4">Growing Specimens...&nbsp;&nbsp;&nbsp;</div>
+        </div>
+      </div>
 
     <div class="container-fluid px-5">
         <div class="row">
@@ -81,50 +92,7 @@
         </div>
     </div>
 
-<script type="text/javascript">
-    (function() {
 
-        // add an h5 tag to each flower div and add the plant name to it from plantName().
-        // var flowerDivs = document.getElementsByClassName("flower");
-        var flora = document.getElementById('flora')
-        var numberOfFlora = 8;
-        for (var i = 0; i < numberOfFlora; i++) {
-            generate(getPlantType())
-
-            var flowerContainer = document.createElement('div');
-                flowerContainer.className = "col-md-3 flower mb-4";
-                flowerContainer.id = plant.seed;
-            var plantImg = document.createElement('img')
-                plantImg.src = CTX.canvas.toDataURL('image/png');
-                plantImg.className = "img-fluid";
-
-            flowerContainer.appendChild(plantImg);
-
-            var infoContainer = document.createElement('div');
-                infoContainer.className = "col-md-8 col-sm-6 mx-auto";
-
-            var h5 = document.createElement("a");
-                h5.className = ""
-                h5.innerHTML = plant.name;
-                h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type;
-                h5.target = "_blank";
-
-            infoContainer.appendChild(h5);
-
-            Object.entries(plant.description).map(obj => {
-                var description = document.createElement("p");
-                description.className = "text-start my-0 ms-2";
-                description.innerHTML = obj.reverse().join(" ")// [1] + obj[0];
-                infoContainer.appendChild(description);
-            })
-
-            flowerContainer.appendChild(infoContainer);
-
-            flora.appendChild(flowerContainer);
-
-        }
-    })();
-</script>
 <svg xmlns="http://www.w3.org/2000/svg">
     <filter id="x-rays" x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
         <feColorMatrix type="matrix" values="1 0 0 0 0
@@ -184,46 +152,55 @@
             <feBlend mode="overlay" in="componentTransfer" in2="SourceGraphic" result="blend"/>
         </filter>    
     </svg>  
-
-    <svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-
-        <defs>
-          <filter id="splotch" width="150%" height="160%" x="-25%" y="-25%">
-          <!-- COLORS -->
-            <feFlood flood-color="#72aa9a" result="COLOR-blue" />‚
-            <feFlood flood-color="#4f623f" result="COLOR-violet" />
-            <feFlood flood-color="#A64DFF" result="COLOR-violet-light" />
-          <!-- COLORS END -->
-    
+    <script type="text/javascript">
+    function catalog() {
+        (function() {
 
     
-
+            // add an h5 tag to each flower div and add the plant name to it from plantName().
+            // var flowerDivs = document.getElementsByClassName("flower");
+            var flora = document.getElementById('flora')
+            var numberOfFlora = 8;
+            for (var i = 0; i < numberOfFlora; i++) {
+                generate(getPlantType())
     
-          <!-- TOP SPLASH -->
-            <feTurbulence baseFrequency="0.017" type="fractalNoise" numOctaves="6" seed="1" result="TOP-SPLASH_10" />
-            <feDisplacementMap scale="90" in="SourceGraphic" in2="TOP-SPLASH_10" result="TOP-SPLASH_30"/>
-            <feComposite operator="in" in="COLOR-violet" in2="TOP-SPLASH_30" result="TOP-SPLASH_40" />
-          <!-- TOP END -->
+                var flowerContainer = document.createElement('div');
+                    flowerContainer.className = "col-md-3 flower mb-4";
+                    flowerContainer.id = plant.seed;
+                var plantImg = document.createElement('img')
+                    plantImg.src = CTX.canvas.toDataURL('image/png');
+                    plantImg.className = "img-fluid";
     
-          <!-- LIGHT EFFECTS -->
-            <feMerge  result="LIGHT-EFFECTS_10">
-              <feMergeNode in="TOP-SPLASH_40" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-            <feColorMatrix type="matrix" 
-            values="0 0 0 0 0,
-            0 0 0 0 0,
-            0 0 0 0 0,
-            0 0 0 1 0" in="LIGHT-EFFECTS_10" result="LIGHT-EFFECTS_20" />
-            <feGaussianBlur stdDeviation="2" in="LIGHT-EFFECTS_20" result="LIGHT-EFFECTS_30" />
-            <feSpecularLighting surfaceScale="5" specularConstant=".75" specularExponent="30" lighting-color="#white" in="LIGHT-EFFECTS_30" result="LIGHT-EFFECTS_40">
-              <fePointLight x="-50" y="-100" z="400" />
-            </feSpecularLighting>
-            <feComposite operator="in" in="LIGHT-EFFECTS_40" in2="LIGHT-EFFECTS_20" result="LIGHT-EFFECTS_50"/>
-            <feComposite operator="arithmetic" k1="0.2" k2="1" k3="1" k4="0" in="LIGHT-EFFECTS_10" in2="LIGHT-EFFECTS_50" result="LIGHT-EFFECTS_60"/>
-          </filter>
-          <!-- LIGHT EFFECTS END -->
-        </defs>
-      </svg>
+                flowerContainer.appendChild(plantImg);
+    
+                var infoContainer = document.createElement('div');
+                    infoContainer.className = "col-md-8 col-sm-6 mx-auto";
+    
+                var h5 = document.createElement("a");
+                    h5.className = ""
+                    h5.innerHTML = plant.name;
+                    h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type;
+                    h5.target = "_blank";
+    
+                infoContainer.appendChild(h5);
+    
+                Object.entries(plant.description).map(obj => {
+                    var description = document.createElement("p");
+                    description.className = "text-start my-0 ms-2";
+                    description.innerHTML = obj.reverse().join(" ")// [1] + obj[0];
+                    infoContainer.appendChild(description);
+                })
+    
+                flowerContainer.appendChild(infoContainer);
+    
+                flora.appendChild(flowerContainer);
+    
+            }
+    
+            document.getElementById("loader").style.display = "none";
+        })();
+    }
+    </script> 
+ 
 </body>
 </html>
