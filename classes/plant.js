@@ -12,7 +12,6 @@ class Plant {
     curveCoeff4 = [Math.random()*0.5,normRand(0.8,1.2)];
 
     constructor(args) {
-        console.log('dna', args.dna)
         this.args =(args != undefined) ? args : {};
         this.ctx = (args.ctx != undefined) ? args.ctx : CTX;  
         this.xof = (args.xof != undefined) ? args.xof : 0;  

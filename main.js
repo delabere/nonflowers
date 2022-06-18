@@ -61,7 +61,7 @@ var Prng = new function(){
     function redo(){y = (Prng.hash(x)+z) % Prng.m; z+=1}
     while (y % Prng.p == 0 || y % Prng.q == 0 || y == 0 || y == 1){redo()}
     Prng.s = y
-    console.log(["int seed",Prng.s])
+    // console.log(["int seed",Prng.s])
     for (var i = 0; i < 10; i++){Prng.next();}
   }
   this.next = function(){
@@ -79,33 +79,28 @@ var Prng = new function(){
     return chart;
   }
 }
+
 Math.oldRandom = Math.random
 Math.random = function(){return Prng.next()}
 Math.seed = function(x){return Prng.seed(x)}
 
 // parse url arguments
-function parseArgs(key2f){
-  var par = window.location.href.split("?")[1]
-  if (par == undefined){return}
-  par = par.split("&")
-  for (var i = 0; i < par.length; i++){
-    var e = par[i].split("=")
-    try{
-      key2f[e[0]](e[1])
-    }catch(e){
-      console.log(e)
-    }
-  }
-}
+// function parseArgs(key2f){
+//   var par = window.location.href.split("?")[1]
+//   if (par == undefined){return}
+//   par = par.split("&")
+//   for (var i = 0; i < par.length; i++){
+//     var e = par[i].split("=")
+//     try{
+//       key2f[e[0]](e[1])
+//     }catch(e){
+//       console.log(e)
+//     }
+//   }
+// }
 
-function newSeed() {
-  SEED = (""+(new Date()).getTime())
-  parseArgs({seed:function(x){SEED = (x==""?SEED:x)}})
-  Math.seed(SEED);
-  console.log('seed', SEED)
-  return SEED;
-}
-// newSeed();
+
+// DNA.newSeed();
 
 //perlin noise adapted from p5.js
 
@@ -575,11 +570,19 @@ function stroke(args){
 
 // vizualize parameters into HTML table & canvas
 function vizParams(PAR){
+  var PAR = Object.keys(PAR).sort().reduce(
+    (obj, key) => { 
+      obj[key] = PAR[key]; 
+      return obj;
+    }, 
+    {}
+  );
+
   if(document.getElementById("summary") == null)
     return;
     
 
-  function input(name, value, min=0, max=255, step=0.001) {
+  function input(name, value, min=0, max=180, step=0.001) {
     var input = '<div class="input-group input-group-sm">'
         input += '<input type="range" class="form-range" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
         input += '<span class="small" id="'+name+'">' +value+'</span>';
@@ -608,7 +611,12 @@ function vizParams(PAR){
       if(name.includes("olor") ) {
         return input(name, a.toFixed(3), min=0, max=1)
       }else{
-        return input(name, a.toFixed(3))
+        if(name.includes("Coeff") || name.includes('hance')) {
+          return input(name, a.toFixed(3), 0, 1.000, 0.1)
+
+        }else{
+          return input(name, a.toFixed(3))
+        }
       }
     }else if(Array.isArray(a)) {
       var r = "<table class='table table-sm table-bordered'><tr>"
@@ -651,7 +659,13 @@ function vizParams(PAR){
 
         }else{
           if(Array.isArray(PAR[k])) {
-            viz += "<td >"+i+"</td><td >"+fmt(PAR[k][i],  k+"[]")+"</td>"
+            viz += "<td>";
+            viz += "<div class='row'>";
+              viz += "<div class='col-1 small'>Type "+i+"</div>";
+              viz += "</div>"
+              viz += "<div class='col-2' >"+input( k+"[]", PAR[k][i], min=1, max=4, step=1)+"</div>"
+            viz += "</div>"
+            viz += "</td>"
           }else{
             viz += "<td >"+i+"</td><td >"+fmt(PAR[k][i], k+ "["+i + "]")+"</td>"
           }
@@ -728,10 +742,8 @@ function createCanvas(w,h) {
 // canvas context operations
 var Layer = new function(){
   this.empty = function(w,h){
-    console.log(w, w != undefined, CANVAS_WIDTH)
     w = (w != undefined) ? w : CANVAS_WIDTH;
     h = (h != undefined) ? h : CANVAS_HEIGHT;
-    console.log(w,h)
     return createCanvas(w,h)
   }
   this.blit = function(ctx0,ctx1,args){
@@ -819,13 +831,10 @@ function makeDownload(){
   down.addEventListener('click', function() {
     var ctx = Layer.empty()
     ctx.drawImage(CTX.canvas,0,0)
-    // this.href = ctx.canvas.toDataURL();
-    var scope = this
-    ctx.canvas.convertToBlob().then( blob => {
-      scope.href = blob;
-    });
-    this.download = SEED + "- " + plant.name;
+    this.href = ctx.canvas.toDataURL();
+    this.download = plant.seed + "- " + plant.name;
   }, false);
+
   document.body.appendChild(down);
   down.click()
   document.body.removeChild(down);
@@ -861,7 +870,7 @@ function makeBG(){
 // generate new plant
 var plant;
 function generate(plantType, dna){
-  newSeed();
+  // newSeed();
 
   // CANVAS_WIDTH = (document.body.clientWidth < 1200) ? document.body.clientWidth : 300;
   // CANVAS_HEIGHT = Math.floor(window.innerHeight * 0.75);
@@ -898,6 +907,12 @@ function reloadWSeed(s){
   window.location.href = u + "?seed=" + s + "&plantType=" + plant.type;
 }
 
+function getSeed() {
+  var queryString = window.location.search;
+  var urlParams = new URLSearchParams(queryString)
+  return urlParams.get('seed')
+}
+
 function getPlantType() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString)
@@ -908,24 +923,28 @@ let regenID = 0;
 let delayOnChange = 300
 function load(){
 
-  makeBG()
+  // makeBG()
   setTimeout(_load,100)
   function _load(){
     let modifiedDNA = $('#dna-form').serializeJSON({});
     let options;
     if(Object.keys(modifiedDNA).length !== 0) {
+      modifiedDNA.seed = plant.seed || getSeed();
       options = new DNA(modifiedDNA); 
+    }else{
+
+      options = new DNA({seed: getSeed()})
     }
     generate(getPlantType(), options);
     vizParams(plant.genes)
-    displayName();
+    // displayName();
     let canvasContainer = document.getElementById('canvas-container')
         canvasContainer.style.height = CANVAS_HEIGHT + "px";
         canvasContainer.innerHTML = "";
         canvasContainer.appendChild(CTX.canvas)
     document.getElementById("loader").style.display = "none";
     document.getElementById("content").style.display = "block";
-    document.getElementById("inp-seed").value = SEED;
+    document.getElementById("inp-seed").value = plant.seed;
     var form = document.getElementById('dna-form')
     form.addEventListener('change', function() {
       clearTimeout(regenID);
@@ -967,19 +986,16 @@ function load(){
 function serialize (data) {
   let obj = {};
   for (let [key, value] of data) {
-    // console.log(key)
     var keys = key.split(".")
     key = keys[0]
 
     if(keys.length > 1) {
-      console.log(keys[1], value)
       obj[key] = serialize([[keys[1].replace('[]',''),value]])
     }
     if (obj[key] !== undefined) {
       if (!Array.isArray(obj[key])) {
         obj[key] = [obj[key]];
       }
-    console.log(key, value)
       obj[key].push(value);
     } else {
       obj[key] = value;

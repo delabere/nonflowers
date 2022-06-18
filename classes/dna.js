@@ -1,15 +1,24 @@
 class DNA {
 
     constructor(genes) {
-        this.seed = newSeed(); // This function should migrate into DNA
+        var PAR = {}
+        if(typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
+          console.log('genes seed', genes.seed)
+          this.seed = genes.seed.toString(); // This function should migrate into DNA
+          Math.seed(this.seed);
+        }else{
+          this.seed = DNA.newSeed(); // This function should migrate into DNA
+        }
+        PAR.seed = Number(this.seed);
         var randint = (x,y) => (Math.floor(normRand(x,y)))
       
 
-        var PAR = {}
         const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
  
-        var flowerShapeMask = (x) => (pow(sin(PI*x),0.2))
-        var leafShapeMask = (x) => (pow(sin(PI*x),0.5))
+        PAR.flowerShapeMaskCoeff = 0.2;
+        PAR.leafShapeMaskCoeff = 0.5;
+        PAR.flowerShapeMask = (x) => ( pow(sin(PI*x),this.genes.flowerShapeMaskCoeff))
+        PAR.leafShapeMask = (x) => (pow(sin(PI*x),this.genes.leafShapeMaskCoeff))
       
         PAR.flowerChance = randChoice([normRand(0,0.08),normRand(0,0.03)])
         PAR.leafChance = randChoice([0, normRand(0,0.1), normRand(0,0.1)])
@@ -18,18 +27,18 @@ class DNA {
           [2,randint(3,7),randint(3,8)],
           [2,randint(3,7),randint(3,8)],
         ])
-        var noiseScale = 100; //10
-        var flowerShapeNoiseSeed = Math.random()*PI
-        var flowerJaggedness = normRand(0.5,8) * noiseScale;
-        PAR.flowerShape = (x) => (Noise.noise(x*flowerJaggedness,flowerShapeNoiseSeed)*flowerShapeMask(x))
+        PAR.noiseScale = 100; //10
+        PAR.flowerShapeNoiseSeed = Math.random()*PI
+        PAR.flowerJaggedness = normRand(0.5,8) * PAR.noiseScale;
+        PAR.flowerShape = (x) => (Noise.noise(x*this.genes.flowerJaggedness,this.genes.flowerShapeNoiseSeed)*this.genes.flowerShapeMask(x))
       
       
         var leafShapeNoiseSeed = Math.random()*PI
-        var leafJaggedness = normRand(0.1,40)
-        var leafPointyness = normRand(0.5,1.5)
+        PAR.leafJaggedness = normRand(0.1,40)
+        PAR.leafPointyness = normRand(0.5,1.5)
         PAR.leafShape = randChoice([
-          (x) => (Noise.noise(x*leafJaggedness,flowerShapeNoiseSeed)*leafShapeMask(x)),
-          (x) => (pow(sin(PI*x),leafPointyness))
+          (x) => (Noise.noise(x*this.genes.leafJaggedness,this.genes.flowerShapeNoiseSeed)*this.genes.leafShapeMask(x)),
+          (x) => (pow(sin(PI*x),this.genes.leafPointyness))
         ])
       
         var flowerHue0 = (normRand(0,180)-130+360)%360
@@ -137,6 +146,16 @@ class DNA {
           ...PAR,
           ...genes
         };
+        this.genes.seed = this.seed;
+    }
+
+
+    static newSeed() {
+      let seed = (""+(new Date()).getTime())
+      // parseArgs({seed:function(x){SEED = (x==""?SEED:x)}})
+      Math.seed(seed);
+      console.log('new seed', seed)
+      return seed;
     }
 
     get flowerColors() {
