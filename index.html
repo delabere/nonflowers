@@ -12,6 +12,8 @@
     <script src="https://kit.fontawesome.com/0cf67825f6.js" crossorigin="anonymous"></script>
     <script src="node_modules/named-web-colors/lib/named-web-colors.js"></script>
     <script src="node_modules/colortranslator/dist/web/colortranslator.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="jquery.serializejson.js"></script>
     <script src="main.js"></script>
     <script src="classes/color.js"></script>
     <script src="classes/dna.js"></script>
@@ -77,6 +79,7 @@
                   <i class="fa-solid fa-download btn" onclick="makeDownload()"></i>
                   <i class="fa-solid fa-dna btn" onclick="toggle('summary','block')"></i>
                   <i class="fa-duotone fa-seedling btn" onclick="toggle('settings','table')"></i>
+                  <i class="fa-solid fa-repeat-1 btn" onclick="load()"></i>
                 </div>
               </td>
             </tr>
@@ -88,7 +91,9 @@
       <div class="d-flex justify-content-center">     
         <table id="options-table" class="table table-sm ">
           <tr><td>
-            <div id="summary" class="d-block" ></div>
+            <form id="dna-form" action="" method="POST">
+              <div id="summary" class="d-block" ></div>
+            </form>
           </td></tr>
 
           <tr><td align="right">

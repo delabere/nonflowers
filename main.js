@@ -421,6 +421,7 @@ v3 = new function(){
     ]
   }
 }
+
 // rgba to css color string
 function rgba(r,g,b,a){
   r = (r != undefined) ? r:255;
@@ -567,162 +568,25 @@ function stroke(args){
 // generate leaf-like structure
 
 
-// generate stem-like structure
-function stem(args){
-  var args =(args != undefined) ? args : {};
-  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
-  var xof = (args.xof != undefined) ? args.xof : 0;  
-  var yof = (args.yof != undefined) ? args.yof : 0;  
-  var rot = (args.rot != undefined) ? args.rot : [PI/2,0,0];
-  var len = (args.len != undefined) ? args.len : 400;
-  var seg = (args.seg != undefined) ? args.seg : 40;
-  var wid = (args.wid != undefined) ? args.wid : (x) => (6);
-  var col = (args.col != undefined) ? args.col : 
-    {min:[250,0.2,0.4,1],max:[250,0.3,0.6,1]}
-  var ben = (args.ben != undefined) ? args.ben : 
-    (x) => ([normRand(-10,10),0,normRand(-5,5)])
 
 
-  // console.log(xof, yof, rot, len, seg, wid, col, ben)
-
-  var disp = v3.zero
-  var crot = v3.zero
-  var P = [disp]
-  var ROT = [crot]
-
-  var orient = (v) => (v3.roteuler(v,rot));
-  
-  for (var i = 0; i < seg; i++){
-    var p = i/(seg-1)
-    crot= v3.add(crot,v3.scale(ben(p),1/seg))
-    disp = v3.add(disp,orient(v3.roteuler([0,0,len/seg],crot)))
-    ROT.push(crot);
-    P.push(disp);
-  }
-  var [L,R] = tubify({pts:P,wid:wid})
-  var wseg = 4;
-  var noiseScale = 10;
-  for (var i = 1; i < P.length; i++){
-    for (var j = 1; j < wseg; j++){
-      var m = (j-1)/(wseg-1);
-      var n = j/(wseg-1);
-      var p = i/(P.length-1)
-
-      var p0 = v3.lerp(L[i-1],R[i-1],m)
-      var p1 = v3.lerp(L[i],R[i],m)
-
-      var p2 = v3.lerp(L[i-1],R[i-1],n)
-      var p3 = v3.lerp(L[i],R[i],n)
-
-      var lt = n/p
-      var h = lerpHue(col.min[0],col.max[0],lt)*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-      var s = mapval(lt,0,1,col.max[1],col.min[1])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-      var v = mapval(lt,0,1,col.min[2],col.max[2])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-      var a = mapval(lt,0,1,col.min[3],col.max[3])
-
-      polygon({ctx:ctx,pts:[p0,p1,p3,p2],
-        xof:xof,yof:yof,fil:true,str:true,col:hsv(h,s,v,a)})
-
-    }
-  }
-  stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
-  stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
-  return P
-}
 
 
-// generate fractal-like branches
-function branch(args){
-  var args =(args != undefined) ? args : {};
-  var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
-  var xof = (args.xof != undefined) ? args.xof : 0;  
-  var yof = (args.yof != undefined) ? args.yof : 0;  
-  var rot = (args.rot != undefined) ? args.rot : [PI/2,0,0];
-  var len = (args.len != undefined) ? args.len : 400;
-  var seg = (args.seg != undefined) ? args.seg : 40;
-  var wid = (args.wid != undefined) ? args.wid : 1;
-  var twi = (args.twi != undefined) ? args.twi : 5;
-  var col = (args.col != undefined) ? args.col : 
-    {min:[50,0.2,0.8,1],max:[50,0.2,0.8,1]}
-  var dep = (args.dep != undefined) ? args.dep : 3
-  var frk = (args.frk != undefined) ? args.frk : 4
-
-  var jnt = []
-  for (var i = 0; i < twi; i++){
-    jnt.push([Math.floor(Math.random()*seg),normRand(-1,1)])
-  }
-
-  function jntdist(x){
-    var m = seg
-    var j = 0
-    for (var i = 0; i< jnt.length; i++){
-      var n = Math.abs(x*seg - jnt[i][0]);
-      if (n < m){
-        m = n
-        j = i
-      }
-    }
-    return [m,jnt[j][1]]
-  }
-
-  var wfun = function (x) {
-    var noiseScale = 10; // 10
-    var [m,j] = jntdist(x)
-    if (m < 1){
-      return wid*(3+5*(1-x))
-    }else{ 
-      return wid*(2+7*(1-x)*mapval(Noise.noise(x*noiseScale),0,1,0.5,1))
-    }
-  }
-  
-  // BENDING
-  var bfun = function (x) {
-    var [m,j] = jntdist(x)
-    if (m < 1){
-      //this causes bends
-      return [0,j*20,0]
-    }else{
-      // this slightly bends randomly
-      return [0,normRand(-5,5),0]
-    }
-  }
-
-  var P = stem({ctx:ctx,
-    xof:xof,yof:yof,
-    rot:rot,
-    len:len,seg:seg,
-    wid:wfun,
-    col:col,
-    ben:bfun})
-  
-  var child = []
-  if (dep > 0 && wid > 0.1){
-    for (var i = 0; i < frk*Math.random(); i++){
-      var ind = Math.floor(normRand(1,P.length))
-
-      var r = grot(P,ind)
-      var L = branch({ctx:ctx,
-        xof:xof+P[ind].x,yof:yof+P[ind].y,
-        rot:[r[0]+normRand(-1,1)*PI/6,r[1]+normRand(-1,1)*PI/6,r[2]+normRand(-1,1)*PI/6],
-        seg:seg,
-        len:len*normRand(0.4,0.6),
-        wid:wid*normRand(0.4,0.7),
-        twi:twi*0.7,
-        dep:dep-1
-       })
-       //child = child.concat(L.map((v)=>([v[0],[v[1].x+P[ind].x,v[1].y+P[ind].y,v[1].z]])))
-       child = child.concat(L)
-    }
-  }
-  return ([[dep,P.map((v)=>([v.x+xof,v.y+yof,v.z]))]]).concat(child)
-
-}
 
 // vizualize parameters into HTML table & canvas
 function vizParams(PAR){
   if(document.getElementById("summary") == null)
     return;
     
+
+  function input(name, value, min=0, max=255, step=0.001) {
+    var input = '<div class="input-group input-group-sm">'
+        input += '<input type="range" class="form-range" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
+        input += '<span class="small" id="'+name+'">' +value+'</span>';
+        input += '</div>';
+    return input
+  }
+
   var div = document.createElement("div")
   var viz = ""
   var tabstyle = ""
@@ -731,20 +595,31 @@ function vizParams(PAR){
   for (var k in PAR){
     if (typeof(PAR[k]) == "number"){
       cnt += 1
-      viz += "<td><td "+tabstyle+">"+k+"</td><td "+tabstyle+">"+fmt(PAR[k])+"</td></td>"
+      viz += "<td><td "+tabstyle+">"+k+"</td><td "+tabstyle+">"+fmt(PAR[k], k)+"</td></td>"
       if (cnt % 4 == 0){
         viz += "</tr><tr>"
       }
     }
   }
   viz += "</tr></table>"
-  function fmt(a){
+
+  function fmt(a, name=""){
     if (typeof(a) == "number"){
-      return a.toFixed(3)
+      if(name.includes("olor") ) {
+        return input(name, a.toFixed(3), min=0, max=1)
+      }else{
+        return input(name, a.toFixed(3))
+      }
+    }else if(Array.isArray(a)) {
+      var r = "<table class='table table-sm table-bordered'><tr>"
+      for (var k in a){
+        r += "<td "+tabstyle+">"+fmt(a[k], ""+name + "[]")+"</td>"
+      }
+      return r+"</tr></table>"   
     }else if (typeof(a)=="object"){
       var r = "<table class='table table-sm table-bordered'><tr>"
       for (var k in a){
-        r += "<td "+tabstyle+">"+fmt(a[k])+"</td>"
+        r += "<td "+tabstyle+">"+fmt(a[k], ""+name + ""+k + "[]")+"</td>"
       }
       return r+"</tr></table>"
     }
@@ -754,14 +629,32 @@ function vizParams(PAR){
   for (var k in PAR){
     if (typeof(PAR[k]) == "object"){
 
-      viz += "<td "+tabstyle+"><table class='table table-sm table-bordered'><tr><td colspan='2' "+tabstyle+">"+k+"</td></tr>"
+      viz += "<td><table class='table table-sm table-bordered'><tr><td colspan='2' >"+k+"</td></tr><tr>"
       
       for (var i in PAR[k]){
-        viz += "<tr><td "+tabstyle+">"+i+"</td><td "+tabstyle+">"+fmt(PAR[k][i])+"</td>"
+
         if (k.includes("olor")){
-          viz += "<td "+tabstyle+">"+"<div style='background-color:"+hsv(...PAR[k][i])
-              +"'>&nbsp&nbsp&nbsp&nbsp&nbsp</div></td>"
-          viz += "<td >" +  Color.fromHSLA(PAR[k][i]).humanName + "</td>"
+          viz += "<td>";
+            viz += "<div class='row'>";
+              viz += "<div class='col-1'>"+i+"</div>";
+              viz += "</div>"
+              viz += "<div class='row'>";
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][0], min=0, max=255)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][1], min=0, max=1)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][2], min=0, max=1)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][3], min=0, max=1)+"</div>"
+              viz += "<div class='col-2' style='background-color:"+hsv(...PAR[k][i])
+                  +"'></div>"
+              viz += "<div class='col-2'>" +  Color.fromHSLA(PAR[k][i]).humanName + "</div>"
+            viz += "</div>"
+          viz += "</td>"
+
+        }else{
+          if(Array.isArray(PAR[k])) {
+            viz += "<td >"+i+"</td><td >"+fmt(PAR[k][i],  k+"[]")+"</td>"
+          }else{
+            viz += "<td >"+i+"</td><td >"+fmt(PAR[k][i], k+ "["+i + "]")+"</td>"
+          }
         }
         viz += "</tr>"
       }
@@ -774,7 +667,8 @@ function vizParams(PAR){
     }
   }
   viz += "</tr></table>"
-  viz += "</td></tr><tr><td align='left' "+tabstyle+"></td></tr></table>"
+  viz += "</td></tr>";
+  viz += "<tr><td align='left' ></td></tr></table>"
   var graphs = document.createElement("div")
   graphs.className = "row";
   // for (var k in PAR){
@@ -794,6 +688,7 @@ function vizParams(PAR){
   // }
   div.innerHTML += viz
   div.lastChild.lastChild.lastChild.lastChild.appendChild(graphs)
+  document.getElementById("summary").innerHTML = "";
   document.getElementById("summary").appendChild(div)
   
 
@@ -965,7 +860,7 @@ function makeBG(){
 
 // generate new plant
 var plant;
-function generate(plantType){
+function generate(plantType, dna){
   newSeed();
 
   // CANVAS_WIDTH = (document.body.clientWidth < 1200) ? document.body.clientWidth : 300;
@@ -977,20 +872,21 @@ function generate(plantType){
   CTX.fillRect(0,0,CTX.canvas.width,CTX.canvas.height)
 
   var plantType =(plantType !== undefined && plantType !== null) ? plantType : ["flower", "woody", "fungus"].sort(() => 0.5 - Math.random())[0];
-  console.log('generating...', plantType)
+  console.log('generating...', plantType);
 
+  let options = {ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH, dna: dna};
   switch(plantType){
     case "flowering":
-      plant = new Flowering({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,});
+      plant = new Flowering(options);
       break;
     case "woody":
-      plant = new Woody({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_HEIGHT - 50,});
+      plant = new Woody(options);
       break;
     case "fungus":
-      plant = new Fungus({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH - 50,});
+      plant = new Fungus(options);
       break;
     default:
-      plant = new Flowering({ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH,});
+      plant = new Flowering(options);
   }
 
   plant.generate();
@@ -1008,18 +904,37 @@ function getPlantType() {
   return urlParams.get('plantType')
 }
 // initialize everything
+let regenID = 0;
+let delayOnChange = 300
 function load(){
 
   makeBG()
   setTimeout(_load,100)
   function _load(){
-    generate(getPlantType())
+    let modifiedDNA = $('#dna-form').serializeJSON({});
+    let options;
+    if(Object.keys(modifiedDNA).length !== 0) {
+      options = new DNA(modifiedDNA); 
+    }
+    generate(getPlantType(), options);
     vizParams(plant.genes)
-    displayName()
-    document.getElementById("canvas-container").appendChild(CTX.canvas)
+    displayName();
+    let canvasContainer = document.getElementById('canvas-container')
+        canvasContainer.style.height = CANVAS_HEIGHT + "px";
+        canvasContainer.innerHTML = "";
+        canvasContainer.appendChild(CTX.canvas)
     document.getElementById("loader").style.display = "none";
     document.getElementById("content").style.display = "block";
     document.getElementById("inp-seed").value = SEED;
+    var form = document.getElementById('dna-form')
+    form.addEventListener('change', function() {
+      clearTimeout(regenID);
+      if (delayOnChange > 0) {
+        regenID = setTimeout(function() { load() }, delayOnChange);
+      } else {
+          load();
+      }
+      }, false);
     // document.getElementById("share-twitter").href=
     //   "https://twitter.com/share?url="
     //   +window.location.href
@@ -1027,7 +942,9 @@ function load(){
   }  
 
   function displayName() {
+
     var flowerDiv = document.getElementById("flower-name");
+    flowerDiv.innerHTML = "";
     var h5 = document.createElement("h4");
         h5.className = "text-center"
         h5.innerHTML = plant.name;
@@ -1044,5 +961,29 @@ function load(){
   }
 
 
+
 }
 
+function serialize (data) {
+  let obj = {};
+  for (let [key, value] of data) {
+    // console.log(key)
+    var keys = key.split(".")
+    key = keys[0]
+
+    if(keys.length > 1) {
+      console.log(keys[1], value)
+      obj[key] = serialize([[keys[1].replace('[]',''),value]])
+    }
+    if (obj[key] !== undefined) {
+      if (!Array.isArray(obj[key])) {
+        obj[key] = [obj[key]];
+      }
+    console.log(key, value)
+      obj[key].push(value);
+    } else {
+      obj[key] = value;
+    }
+  }
+  return obj;
+}

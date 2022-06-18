@@ -1,9 +1,10 @@
 class DNA {
 
-    constructor() {
+    constructor(genes) {
         this.seed = newSeed(); // This function should migrate into DNA
         var randint = (x,y) => (Math.floor(normRand(x,y)))
       
+
         var PAR = {}
         const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
  
@@ -126,7 +127,16 @@ class DNA {
         PAR.branchColor = {min:[branchHue,branchSaturation,branchValue,1],
                            max:[branchHue,branchSaturation,branchValue,1]}
 
-        this.genes = PAR;
+        // if(genes !== undefined) {
+          // genes.flowerOpenCurve = PAR.flowerOpenCurve;
+          // genes.flowerColorCurve = PAR.flowerColorCurve;
+          // this.genes = genes;
+          // return 
+        // }
+        this.genes = {
+          ...PAR,
+          ...genes
+        };
     }
 
     get flowerColors() {

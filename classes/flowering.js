@@ -33,7 +33,7 @@ class Flowering extends Plant {
             
         for (var i = 0; i < this.genes.stemCount; i++){
             var r = [PI/2,0,normRand(-1,1)*PI]
-            var P = stem({
+            var P = this.stem({
                 ctx:lay0,xof:x0,yof:y0,
                 len:this.genes.stemLength*normRand(0.7,1.3),
                 rot:r,
@@ -68,7 +68,7 @@ class Flowering extends Plant {
         
             var hr = grot(P,-1)
             if (this.genes.sheathLength != 0){
-            stem({ctx:lay0,xof:x0+P[-1].x,yof:y0+P[-1].y,
+            this.stem({ctx:lay0,xof:x0+P[-1].x,yof:y0+P[-1].y,
                 rot:hr,
                 len:this.genes.sheathLength,
                 col:{min:[60,0.3,0.9,1],max:[60,0.3,0.9,1]},
@@ -77,7 +77,7 @@ class Flowering extends Plant {
                     )})
             }
             for (var j = 0; j < Math.max(1,this.genes.shootCount*normRand(0.5,1.5)); j++){
-            var P_ = stem({ctx:lay0,xof:x0+P[-1].x,yof:y0+P[-1].y,
+            var P_ = this.stem({ctx:lay0,xof:x0+P[-1].x,yof:y0+P[-1].y,
             rot:hr,
             len:this.genes.shootLength*normRand(0.5,1.5),
             col:{min:[70,0.2,0.9,1],max:[70,0.2,0.9,1]},

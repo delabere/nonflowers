@@ -5,7 +5,14 @@ class Plant {
     geoAdjectives = ["cave", "dwarf", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
     type = "plant"
 
+    curveCoeff0 = [normRand(-0.5,0.5),normRand(5,10)]
+    curveCoeff1 = [Math.random()*PI, normRand(1,5)]
+    curveCoeff2 = [Math.random()*PI,normRand(5,15)]
+    curveCoeff3 = [Math.random()*PI,normRand(1,5)]
+    curveCoeff4 = [Math.random()*0.5,normRand(0.8,1.2)];
+
     constructor(args) {
+        console.log('dna', args.dna)
         this.args =(args != undefined) ? args : {};
         this.ctx = (args.ctx != undefined) ? args.ctx : CTX;  
         this.xof = (args.xof != undefined) ? args.xof : 0;  
@@ -88,7 +95,7 @@ class Plant {
         var xref = (bd.cWidth/2 - boundingWidth/2) - (this.xof -  boundingWidth/2)
         var yref = (bd.cHeight/2 - boundingHeight/2) - bd.ymin/2
 
-        Layer.blit(this.ctx,layer0,{ble:blend1,xof:xref + xExtra,yof:yref + yExtra})
+        Layer.blit(this.ctx,layer0,{ble:blend1,xof:xref  + xExtra,yof:yref + yExtra})
         Layer.blit(this.ctx,layer1,{ble:blend2,xof:xref + xExtra,yof:yref + yExtra})
 
     }
@@ -117,6 +124,8 @@ class Plant {
         var L = [disp]
         var R = [disp]
       
+
+
         var orient = (v) => (v3.roteuler(v,rot));
       
         for (var i = 0; i < seg; i++){
@@ -126,7 +135,7 @@ class Plant {
           var w = wid(p);
           var l = v3.add(disp,orient(v3.roteuler([-w,0,0],crot)));
           var r = v3.add(disp,orient(v3.roteuler([w,0,0],crot)));
-          
+
           if (i > 0){
             var v0 = v3.subtract(disp,L[-1]);
             var v1 = v3.subtract(l,disp);
@@ -185,5 +194,162 @@ class Plant {
         stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:rgba(120,100,0,0.3)})
         return P
       }
-     
+
+    // generate fractal-like branches
+    branch(args){
+        var args =(args != undefined) ? args : {};
+        var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
+        var xof = (args.xof != undefined) ? args.xof : 0;  
+        var yof = (args.yof != undefined) ? args.yof : 0;  
+        var rot = (args.rot != undefined) ? args.rot : [PI/2,0,0];
+        var len = (args.len != undefined) ? args.len : 400;
+        var seg = (args.seg != undefined) ? args.seg : 40;
+        var wid = (args.wid != undefined) ? args.wid : 1;
+        var twi = (args.twi != undefined) ? args.twi : 5;
+        var col = (args.col != undefined) ? args.col : 
+        {min:[50,0.2,0.8,1],max:[50,0.2,0.8,1]}
+        var dep = (args.dep != undefined) ? args.dep : 3
+        var frk = (args.frk != undefined) ? args.frk : 4
+    
+        var jnt = []
+        for (var i = 0; i < twi; i++){
+        jnt.push([Math.floor(Math.random()*seg),normRand(-1,1)])
+        }
+    
+        function jntdist(x){
+        var m = seg
+        var j = 0
+        for (var i = 0; i< jnt.length; i++){
+            var n = Math.abs(x*seg - jnt[i][0]);
+            if (n < m){
+            m = n
+            j = i
+            }
+        }
+        return [m,jnt[j][1]]
+        }
+    
+        var wfun = function (x) {
+        var noiseScale = 10; // 10
+        var [m,j] = jntdist(x)
+        if (m < 1){
+            return wid*(3+5*(1-x))
+        }else{ 
+            return wid*(2+7*(1-x)*mapval(Noise.noise(x*noiseScale),0,1,0.5,1))
+        }
+        }
+        
+        // BENDING
+        var bfun = function (x) {
+        var [m,j] = jntdist(x)
+            if (m < 1){
+                //this causes bends
+                return [0,j*20,0]
+            }else{
+                // this slightly bends randomly
+                return [0,normRand(-5,5),0]
+            }
+        }
+    
+        var P = this.stem({ctx:ctx,
+        xof:xof,yof:yof,
+        rot:rot,
+        len:len,seg:seg,
+        wid:wfun,
+        col:col,
+        ben:bfun})
+        
+        var child = []
+        if (dep > 0 && wid > 0.1){
+        for (var i = 0; i < frk*Math.random(); i++){
+            var ind = Math.floor(normRand(1,P.length))
+    
+            var r = grot(P,ind)
+            var L = this.branch({ctx:ctx,
+            xof:xof+P[ind].x,yof:yof+P[ind].y,
+            rot:[r[0]+normRand(-1,1)*PI/6,r[1]+normRand(-1,1)*PI/6,r[2]+normRand(-1,1)*PI/6],
+            seg:seg,
+            len:len*normRand(0.4,0.6),
+            wid:wid*normRand(0.4,0.7),
+            twi:twi*0.7,
+            dep:dep-1
+            })
+            //child = child.concat(L.map((v)=>([v[0],[v[1].x+P[ind].x,v[1].y+P[ind].y,v[1].z]])))
+            child = child.concat(L)
+        }
+        }
+        return ([[dep,P.map((v)=>([v.x+xof,v.y+yof,v.z]))]]).concat(child)
+    
+  } 
+
+// generate stem-like structure
+stem(args){
+    var args =(args != undefined) ? args : {};
+    var ctx = (args.ctx != undefined) ? args.ctx : CTX;  
+    var xof = (args.xof != undefined) ? args.xof : 0;  
+    var yof = (args.yof != undefined) ? args.yof : 0;  
+    var rot = (args.rot != undefined) ? args.rot : [PI/2,0,0];
+    var len = (args.len != undefined) ? args.len : 400;
+    var seg = (args.seg != undefined) ? args.seg : 40;
+    var wid = (args.wid != undefined) ? args.wid : (x) => (6);
+    var col = (args.col != undefined) ? args.col : 
+      {min:[250,0.2,0.4,1],max:[250,0.3,0.6,1]}
+    var ben = (args.ben != undefined) ? args.ben : 
+      (x) => ([normRand(-10,10),0,normRand(-5,5)])
+  
+  
+    // console.log(xof, yof, rot, len, seg, wid, col, ben)
+  
+    var disp = v3.zero
+    var crot = v3.zero
+    var P = [disp]
+    var ROT = [crot]
+  
+    var orient = (v) => (v3.roteuler(v,rot));
+    
+    for (var i = 0; i < seg; i++){
+      var p = i/(seg-1)
+      crot= v3.add(crot,v3.scale(ben(p),1/seg))
+      disp = v3.add(disp,orient(v3.roteuler([0,0,len/seg],crot)))
+      ROT.push(crot);
+      P.push(disp);
+    }
+    var [L,R] = tubify({pts:P,wid:wid})
+    var wseg = 8;
+    var noiseScale = 10;
+    for (var i = 1; i < P.length; i++){
+      for (var j = 1; j < wseg; j++){
+        var m = (j-1)/(wseg-1);
+        var n = j/(wseg-1);
+        var p = i/(P.length-1)
+        // var pcurve = this.curveCoeff2;
+        // p = sigmoid( (j*p) * pcurve[0], pcurve[1]) * 0.4
+        // var mCurve = this.curveCoeff2
+        // m = sigmoid( ( m) * mCurve[0], mCurve[1]) * 0.7
+
+        // var ncurve = this.curveCoeff4;
+        // n = sigmoid( (j + n) * ncurve[0], ncurve[1]) * 2
+
+
+        var p0 = v3.lerp(L[i-1],R[i-1],m)
+        var p1 = v3.lerp(L[i],R[i],m)
+  
+        var p2 = v3.lerp(L[i-1],R[i-1],n)
+        var p3 = v3.lerp(L[i],R[i],n)
+  
+        var lt = n/p
+        var h = lerpHue(col.min[0],col.max[0],lt)*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+        var s = mapval(lt,0,1,col.max[1],col.min[1])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+        var v = mapval(lt,0,1,col.min[2],col.max[2])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+        var a = mapval(lt,0,1,col.min[3],col.max[3])
+  
+        polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+          xof:xof,yof:yof,fil:true,str:true,col:hsv(h,s,v,a)})
+  
+      }
+    }
+    stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
+    stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
+    return P
+  }
 }

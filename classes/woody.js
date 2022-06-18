@@ -19,7 +19,7 @@ class Woody extends Plant {
         var x0 = cwid*0.5
         var y0 = cheight*0.99
              
-        var PL = branch({
+        var PL = this.branch({
           ctx:lay0,xof:x0,yof:y0,
           wid:this.genes.branchWidth,
           twi:this.genes.branchTwist,
@@ -51,7 +51,7 @@ class Woody extends Plant {
       
                 var hr = [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0]
       
-                var P_ = stem({ctx:lay0,
+                var P_ = this.stem({ctx:lay0,
                   xof:PL[i][1][j].x, yof:PL[i][1][j].y,
                   rot:hr,
                   len:this.genes.pedicelLength,
