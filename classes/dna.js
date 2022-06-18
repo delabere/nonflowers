@@ -19,7 +19,7 @@ class DNA {
         PAR.leafShapeMaskCoeff = 0.5;
         PAR.flowerShapeMask = (x) => ( pow(sin(PI*x),this.genes.flowerShapeMaskCoeff))
         PAR.leafShapeMask = (x) => (pow(sin(PI*x),this.genes.leafShapeMaskCoeff))
-      
+        PAR.capShapeMask  = (x) => ( sigmoid(sin(PI*x),this.genes.flowerShapeMaskCoeff)) 
         PAR.flowerChance = randChoice([normRand(0,0.08),normRand(0,0.03)])
         PAR.leafChance = randChoice([0, normRand(0,0.1), normRand(0,0.1)])
         PAR.leafType = randChoice([

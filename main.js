@@ -584,8 +584,8 @@ function vizParams(PAR){
 
   function input(name, value, min=0, max=180, step=0.00000000000001) {
     var input = '<div class="input-group input-group-sm">'
-        input += '<input type="number" class="form-control" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
-        // input += '<span class="small" id="'+name+'">' +value+'</span>';
+        input += '<input type="range" class="form-range" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
+        input += '<span class="small" id="'+name+'">' +value+'</span>';
         input += '</div>';
     return input
   }
@@ -647,10 +647,10 @@ function vizParams(PAR){
               viz += "<div class='col-1'>"+i+"</div>";
               viz += "</div>"
               viz += "<div class='row'>";
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][0], min=0,)+"</div>"
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][1], min=0,)+"</div>"
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][2], min=0,)+"</div>"
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][3], min=0,)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][0], min=0, max=300)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][1], min=0,max=1)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][2], min=0,max=1)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][3], min=0,max=1)+"</div>"
               viz += "<div class='col-2' style='background-color:"+hsv(...PAR[k][i])
                   +"'></div>"
               viz += "<div class='col-2'>" +  Color.fromHSLA(PAR[k][i]).humanName + "</div>"
