@@ -2,12 +2,12 @@ class DNA {
 
     constructor(genes) {
         var PAR = {}
-        if(typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
+        if(typeof(genes) == "undefined") {
+          this.seed = DNA.newSeed(); // This function should migrate into DNA
+        }else if( typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
           console.log('genes seed', genes.seed)
           this.seed = genes.seed.toString(); // This function should migrate into DNA
           Math.seed(this.seed);
-        }else{
-          this.seed = DNA.newSeed(); // This function should migrate into DNA
         }
         PAR.seed = Number(this.seed);
         var randint = (x,y) => (Math.floor(normRand(x,y)))

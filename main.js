@@ -582,10 +582,10 @@ function vizParams(PAR){
     return;
     
 
-  function input(name, value, min=0, max=180, step=0.001) {
+  function input(name, value, min=0, max=180, step=0.00000000000001) {
     var input = '<div class="input-group input-group-sm">'
-        input += '<input type="range" class="form-range" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
-        input += '<span class="small" id="'+name+'">' +value+'</span>';
+        input += '<input type="number" class="form-control" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
+        // input += '<span class="small" id="'+name+'">' +value+'</span>';
         input += '</div>';
     return input
   }
@@ -609,13 +609,13 @@ function vizParams(PAR){
   function fmt(a, name=""){
     if (typeof(a) == "number"){
       if(name.includes("olor") ) {
-        return input(name, a.toFixed(3), min=0, max=1)
+        return input(name, a, min=0, max=1)
       }else{
         if(name.includes("Coeff") || name.includes('hance')) {
-          return input(name, a.toFixed(3), 0, 1.000, 0.1)
+          return input(name, a, 0, 1.000, 0.1)
 
         }else{
-          return input(name, a.toFixed(3))
+          return input(name, a)
         }
       }
     }else if(Array.isArray(a)) {
@@ -647,10 +647,10 @@ function vizParams(PAR){
               viz += "<div class='col-1'>"+i+"</div>";
               viz += "</div>"
               viz += "<div class='row'>";
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][0], min=0, max=255)+"</div>"
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][1], min=0, max=1)+"</div>"
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][2], min=0, max=1)+"</div>"
-                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][3], min=0, max=1)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][0], min=0,)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][1], min=0,)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][2], min=0,)+"</div>"
+                viz += "<div class='col-2'>"+input( k+"["+i+"][]", PAR[k][i][3], min=0,)+"</div>"
               viz += "<div class='col-2' style='background-color:"+hsv(...PAR[k][i])
                   +"'></div>"
               viz += "<div class='col-2'>" +  Color.fromHSLA(PAR[k][i]).humanName + "</div>"
@@ -663,7 +663,7 @@ function vizParams(PAR){
             viz += "<div class='row'>";
               viz += "<div class='col-1 small'>Type "+i+"</div>";
               viz += "</div>"
-              viz += "<div class='col-2' >"+input( k+"[]", PAR[k][i], min=1, max=4, step=1)+"</div>"
+              viz += "<div class='col-2' >"+input( k+"[]", PAR[k][i], min=1, max=4)+"</div>"
             viz += "</div>"
             viz += "</td>"
           }else{
@@ -928,11 +928,10 @@ function load(){
   function _load(){
     let modifiedDNA = $('#dna-form').serializeJSON({});
     let options;
-    if(Object.keys(modifiedDNA).length !== 0) {
+    if(Object.keys(modifiedDNA).length !== 0 && plant.seed !== undefined) {
       modifiedDNA.seed = plant.seed || getSeed();
       options = new DNA(modifiedDNA); 
     }else{
-
       options = new DNA({seed: getSeed()})
     }
     generate(getPlantType(), options);
@@ -954,10 +953,7 @@ function load(){
           load();
       }
       }, false);
-    // document.getElementById("share-twitter").href=
-    //   "https://twitter.com/share?url="
-    //   +window.location.href
-    //   +"&amp;text="+window.location.href+";hashtags=nonflowers";
+
   }  
 
   function displayName() {
@@ -980,26 +976,4 @@ function load(){
   }
 
 
-
-}
-
-function serialize (data) {
-  let obj = {};
-  for (let [key, value] of data) {
-    var keys = key.split(".")
-    key = keys[0]
-
-    if(keys.length > 1) {
-      obj[key] = serialize([[keys[1].replace('[]',''),value]])
-    }
-    if (obj[key] !== undefined) {
-      if (!Array.isArray(obj[key])) {
-        obj[key] = [obj[key]];
-      }
-      obj[key].push(value);
-    } else {
-      obj[key] = value;
-    }
-  }
-  return obj;
 }
