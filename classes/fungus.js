@@ -12,6 +12,15 @@ class Fungus extends Plant {
         super(dna);
     }
 
+    get description() {
+
+      return {
+          caps: new ColorRangeDescriptor(this.dna.flowerColors),
+          stems: new ColorRangeDescriptor(this.dna.branchColors),
+      }
+
+  }
+
     generate(args) {
         var args =(this.args != undefined) ? this.args : {};
 

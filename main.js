@@ -936,7 +936,7 @@ function load(){
     }
     generate(getPlantType(), options);
     vizParams(plant.genes)
-    // displayName();
+    displayName();
     let canvasContainer = document.getElementById('canvas-container')
         canvasContainer.style.height = CANVAS_HEIGHT + "px";
         canvasContainer.innerHTML = "";
