@@ -150,12 +150,7 @@
                     infoContainer.appendChild(description);
                 })
 
-                var description = document.createElement("p");
-                    description.className = "text-start my-0 ms-2 test";
-                    description.innerHTML = plant.dna.genes.flowerColor.min.map(x => x.toFixed(3))
-                    description.innerHTML += "<br />"
-                    description.innerHTML += plant.dna.genes.flowerColor.max.map(x => x.toFixed(3))
-                
+     
                 infoContainer.appendChild(description);
     
                 flowerContainer.appendChild(infoContainer);
