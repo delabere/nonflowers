@@ -2,7 +2,8 @@ class DNA {
 
     constructor(genes) {
         var PAR = {}
-        if(typeof(genes) == "undefined") {
+        console.log(genes)
+        if(typeof(genes) == "undefined" || genes.seed == null) {
           this.seed = DNA.newSeed(); // This function should migrate into DNA
         }else if( typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
           console.log('genes seed', genes.seed)
