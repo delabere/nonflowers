@@ -45,8 +45,11 @@ body {
 .flower img {
   padding-bottom: 1em;
   min-width: 200px;
-  filter:  url(#warm-x-rays)  contrast(1) saturate(.99)
+   /* contrast(1) saturate(.99) */
 }
+/* .flower img:after {
+  filter:  url('#noiseFilter');
+} */
 .flower a { 
   text-decoration: none;
   margin-bottom: 0em;

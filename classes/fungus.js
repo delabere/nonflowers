@@ -66,6 +66,18 @@ class Fungus extends Plant {
             var capShape = (x) => (sigmoid(Noise.noise(x*this.genes.flowerJaggedness,this.genes.flowerShapeNoiseSeed),0.22)*this.genes.capShapeMask(x))
 
 
+            var sheathRotation = grot(P,-1)
+            if (this.genes.sheathLength != 0){
+              this.stem({ctx:lay0,xof:x0+P[this.clamp(P.length-2,0,P.length-1)].x + capOffset,yof:y0+P[-1].y + 18,
+                  rot:sheathRotation,
+                  len:this.clamp(this.genes.sheathLength, 0, this.genes.flowerLength * 1.7),
+                  seg: 18,
+                  col: this.genes.innerColor,
+                  wid:(x) => (this.genes.sheathWidth + this.genes.stemWidth * 1.5 )*(pow(sin(x*PI),2)-x*1.5+0.6),
+                  ben:(x) => ([0.2,0.2,0]
+                      )})
+              }
+
             //GILLS
             this.genes.leafColor = {min: [normRand(58, 62),normRand(0.2,0.32),normRand(0.8, 0.94),0.999],
                 max: [normRand(58, 62),normRand(0.2,0.62),normRand(0.1, 0.3),0.999]}
@@ -95,13 +107,9 @@ class Fungus extends Plant {
         }
 
 
-        
-
-
         this.addFilters(lay0,lay1);
 
-        this.position(lay0,lay1, 0, 0, "normal", "normal"); 
-        // this.position(lay1,lay1, 0, 0, "normal", "overlay"); 
+        this.position(lay0,lay1, 0, 0, "normal", "screen"); 
         // this.position(lay0,lay1, 0, 0, "destination-over", "normal"); 
         
     }

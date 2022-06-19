@@ -71,8 +71,9 @@ class Plant {
     addFilters(layer0, layer1) {
         if(FILTERING) {
             Layer.filter(layer0,Filter.fade)
+            // Layer.filter(layer1,Filter.fade)
             Layer.filter(layer0,Filter.wispy)
-            Layer.filter(layer1,Filter.wispy)
+            // Layer.filter(layer1,Filter.wispy)
         }
     }
 

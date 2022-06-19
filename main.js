@@ -38,7 +38,7 @@ var pow = Math.pow
 var CANVAS_WIDTH;
 var CANVAS_HEIGHT;
 
-const FILTERING = false;
+const FILTERING = true;
 
 function rad(x){return x * deg2rad}
 function deg(x){return x * rad2deg}
@@ -713,11 +713,12 @@ var Filter = new function(){
   this.wispy = function(x,y,r,g,b,a){
     var n = Noise.noise(x*0.2,y*0.2)
     var m = Noise.noise(x*0.5,y*0.5,2)
-    return [r,g*mapval(m,0,1,0.95,1),b*mapval(m,0,1,0.9,1),a*mapval(n,0,1,0.5,1)]
+    return [r,g*mapval(m,0,1,0.95,1),b*mapval(m,0,1,0.8,1),a*mapval(n,0,1,0.7,1)]
   }
-  this.fade = function(x,y,r,g,b,a){
-    var n = Noise.noise(x*0.01,y*0.01)
-    return [r,g,b,a*Math.min(Math.max(mapval(n,0,1,0,1),0),1)]
+  this.fade = function(x,y,r,g,b,a,noise=0.0217){
+    var n = Noise.noise(x*noise,y*noise)
+    var m = Noise.noise(x*0.5,y*0.5,2)
+    return [r,g*mapval(m,0,1,0.95,1),b*mapval(m,0,1,0.8,1),a*Math.min(Math.max(mapval(n,0,0.323,0,1),0),1)]
   }
 }
 
