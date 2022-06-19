@@ -40,6 +40,7 @@ class Fungus extends Plant {
         for (var i = 0; i < Math.floor(this.genes.stemCount ); i++){
             var r = [PI/2,0,normRand(-1,1)*PI]
             var capOffset =  normRand(-40,50);
+            var gillOffset = 6
 
             // STEM
             var P = this.stem({
@@ -60,8 +61,25 @@ class Fungus extends Plant {
             var saturationWeight = normRand(0.0, 0.1)
             this.genes.innerColor.min[1] = this.clamp(this.genes.innerColor.min[1] , 0, 1);
             this.genes.innerColor.max[1] = this.clamp(this.genes.innerColor.max[1] + saturationWeight, 0, 1);;
+            this.genes.flowerJaggedness = mapval(this.genes.flowerJaggedness, 10, 80, 40, 50);
             var hr = grot(P,-1)
-            var capShape = (x) => (sigmoid(x,0.2)*this.genes.capShapeMask(x))
+            var capShape = (x) => (sigmoid(Noise.noise(x*this.genes.flowerJaggedness,this.genes.flowerShapeNoiseSeed),0.22)*this.genes.capShapeMask(x))
+
+
+            //GILLS
+            this.genes.leafColor = {min: [normRand(58, 62),normRand(0.2,0.32),normRand(0.8, 0.94),0.999],
+                max: [normRand(58, 62),normRand(0.2,0.62),normRand(0.1, 0.3),0.999]}
+
+            
+            var capBend = [normRand(0, 0.2),normRand(0, 0.2),0];
+            this.cap({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y + gillOffset,
+              rot:hr,
+              len:(this.genes.flowerLength+gillOffset*3.5),
+              gil: true,
+              col:this.genes.leafColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
+              wid:(x) => capShape(x) * this.genes.flowerWidth*(sin(cos(x*PI/2))-cos(x*PI/2)*this.clamp(this.genes.flowerWidth*0.3, 18,30) *0.9),
+              ben:(x) => (capBend)})
+
 
             // CAP
             this.cap({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y,
@@ -69,8 +87,10 @@ class Fungus extends Plant {
               len:this.genes.flowerLength*normRand(0.2, 1.2) + 70,
               col:this.genes.innerColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
               wid:(x) => capShape(x) * this.genes.flowerWidth*(sin(cos(x*PI/2),0.9)-cos(x*PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
-              ben:(x) => ([normRand(0, 0.2),normRand(0, 0.2),0]
-                  )})
+              ben:(x) => (capBend)})
+
+
+
 
         }
 
@@ -96,6 +116,7 @@ class Fungus extends Plant {
       var wid = (args.wid != undefined) ? args.wid : (x) => (6);
       var col = (args.col != undefined) ? args.col : 
         {min:[250,0.2,0.4,1],max:[250,0.3,0.6,1]}
+      var gil = (args.gil != undefined) ? args.gil : false;
       var ben = (args.ben != undefined) ? args.ben : 
         (x) => ([normRand(-10,10),0,normRand(-5,5)])
     
@@ -130,15 +151,15 @@ class Fungus extends Plant {
           // m = sigmoid( ( m) * mCurve[0], mCurve[1]) * 0.7
  
             //Adds shading
-          var mCurve = this.curveCoeff4
-          var mx = sigmoid( m * mCurve[0], mCurve[1]) * 2.2// * mCurve[0]/PI//* cos(PI/seg) * 0.09 * (0.7 )
-
-          var pcurve = this.curveCoeff0
-          var px = sigmoid( p * pcurve[0], pcurve[1]) * sin(PI/1*seg) //* mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
-
-          var ncurve = this.curveCoeff2
-          var nx = sin( ( n) * ncurve[0], ncurve[1]) //  * cos(PI/px) * 0.1//* (Math.PI/2) 
+            var mCurve = this.curveCoeff4
+            var mx = sigmoid( m * mCurve[0], mCurve[1]) * 2.2// * mCurve[0]/PI//* cos(PI/seg) * 0.09 * (0.7 )
   
+            var pcurve = this.curveCoeff0
+            var px = sigmoid( p * pcurve[0], pcurve[1]) * sin(PI/1*seg) //* mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
+  
+            var ncurve = this.curveCoeff2
+            var nx = sin( ( n) * ncurve[0], ncurve[1]) //  * cos(PI/px) * 0.1//* (Math.PI/2) 
+    
   
           var p0 = v3.lerp(L[i-1],R[i-1],m) //- mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
           var p1 = v3.lerp(L[i],R[i],m) //- mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
@@ -146,11 +167,11 @@ class Fungus extends Plant {
           var p2 = v3.lerp(L[i-1],R[i-1],n)
           var p3 = v3.lerp(L[i],R[i],n)
 
-          var pp0 = v3.lerp(L[i-1],R[i-1],m)
-          var pp1 = v3.lerp(L[i],R[i],m)
+          var pp0 = v3.lerp(L[i-1],R[i-1],mx)
+          var pp1 = v3.lerp(L[i],R[i],mx)
     
-          var pp2 = v3.lerp(L[i-1],R[i-1],n)
-          var pp3 = v3.lerp(L[i],R[i],n) 
+          var pp2 = v3.lerp(L[i-1],R[i-1],nx)
+          var pp3 = v3.lerp(L[i],R[i],nx) 
 
           var lt = sin((nx/p) * PI/2) * 0.5 + 0.1 
 
@@ -160,11 +181,16 @@ class Fungus extends Plant {
           var a = mapval(lt,0.8,1,col.min[3],col.max[3])
 
           // console.log(col.min[0], col.max[0], h, lt, this.dna.color([h,s,v,a]).humanName)
+          if(gil){
+            polygon({ctx:ctx,pts:[p0,p0,p2,p3],
+              xof:xof,yof:yof,fil:true, str:true,col:hsv(h,s*0.8,v*0.6,0.7)}) 
+          }else{
+            polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+              xof:xof,yof:yof,fil:true,str:true,col:hsv(this.clamp(h,0, 359),this.clamp(s*0.8, 0,1),v,1)})
+            polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+              xof:xof,yof:yof,fil:true,str:false,col:hsv(this.clamp(h,0, 359),this.clamp(s*0.8, 0,1),v,1)})
+          }
 
-          polygon({ctx:ctx,pts:[p0,p1,p3,p2],
-            xof:xof,yof:yof,fil:true,str:true,col:hsv(this.clamp(h,0, 359),this.clamp(s*0.8, 0,1),v,1)})
-          // polygon({ctx:ctx,pts:[pp1,pp1,pp3,pp2],
-            // xof:xof,yof:yof,fil:true,str:false,col:hsv(h,s,v,0.8)}) 
         }
       }
       stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
