@@ -4,8 +4,9 @@ class Fungus extends Plant {
     mushroomNames = []
 
     plantNames = ["Cap", "Fingers", "Mushroom", "Fungus", "Stool", "Umbrella", "Hat", "Crown", "Stem"] 
-    descriptiveAdjectives = ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "spongy", "inky", "toppled", "reaching", "upright"];
-    geoAdjectives = ["cave", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+    // stinky man fingers
+    descriptiveAdjectives = ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "stinky", "spongy", "inky", "toppled", "reaching", "upright"];
+    geoAdjectives = ["cave","man", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
     type = "fungus";
 
     constructor(dna) {
@@ -32,33 +33,20 @@ class Fungus extends Plant {
         var x0 = cwid*0.5;
         var y0 = cheight*0.9; 
 
+        // ideal stem color
+        this.genes.branchColor = {min: [normRand(50.63842005726726, 56),normRand(0.2,0.32),normRand(0.26011155920859, 0.34),0.999],
+          max: [normRand(58.63842005726724, 62),normRand(0.4, 0.7),normRand(0.86011155920859, 0.99),0.999]}
   
-        // this.genes.stemBend =0;
-        // this.genes.branchWidth = 1;
-        // this.genes.pedicelLength = 0;
-        // this.genes.shootLength = 0;
-        // this.genes.flowerChance = 0;
-        // this.genes.flowerPetal = 0
-        // this.genes.stemLength = 0;
-        // this.genes.shootCount = 0;
-        // this.genes.leafWidth = 0;
-        // this.genes.leafChance = 0
-        // this.genes.stemCount = 0;
-        // this.genes.innerLength = 0;
-        // this.genes.flowerLength =0;
-        // this.genes.stemWidth =0;
-        // this.genes.sheathLength =0;
-        // this.genes.leafPosition =0;
-        // this.genes.innerWidth =0
-        // this.genes.sheathWidth =0
-        // this.genes.leafLength =0;
         for (var i = 0; i < Math.floor(this.genes.stemCount ); i++){
             var r = [PI/2,0,normRand(-1,1)*PI]
-            var capOffset =  normRand(-60,90);
+            var capOffset =  normRand(-40,50);
+
+            // STEM
             var P = this.stem({
                 ctx:lay0,xof:x0 + capOffset,yof:y0,
                 len:this.genes.stemLength * normRand(0.002, 1.2) + 40,
                 rot:r,
+                seg: 30,
                 col: this.genes.branchColor,
                 wid:(x) => (this.genes.stemWidth*
                     (pow(sin(x*PI/2+PI/2),0.5)*Noise.noise(x*120)*1.2+0.9)),
@@ -69,30 +57,20 @@ class Fungus extends Plant {
                     ]
                 )})
             
-            // leaf({ctx:lay0,
-            //   xof:PL[0][1][0].x, yof:PL[0][1][0].y ,    
-            //   len: 20,
-            //   vei:[0,0],
-            //   cof: (x) => (50),
-            //   flo: true, 
-            //   col:this.genes.branchColor,
-            //   ben: (x) => ([0,-20,-20]),
-            //   rot:[-10,20,-10], // [normRand(-1,1)*PI,normRand(-1,1)*PI,normRand(-1,1)*0],
-            //   wid:(x) => (40)})  
-            // var r = normRand(-0.25,0.95) 
-            var saturationWeight = normRand(0.0, 0.2)
+            var saturationWeight = normRand(0.0, 0.1)
             this.genes.innerColor.min[1] = this.clamp(this.genes.innerColor.min[1] , 0, 1);
             this.genes.innerColor.max[1] = this.clamp(this.genes.innerColor.max[1] + saturationWeight, 0, 1);;
             var hr = grot(P,-1)
             var capShape = (x) => (sigmoid(x,0.2)*this.genes.capShapeMask(x))
-     
-                    this.cap({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y,
-                      rot:hr,
-                      len:this.genes.flowerLength*normRand(0.2, 1.2) + 70,
-                      col:this.genes.innerColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
-                      wid:(x) => capShape(x) * this.genes.flowerWidth*(sin(cos(x*PI/2),0.9)-cos(x*PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
-                      ben:(x) => ([normRand(0, 0.2),normRand(0, 0.2),0]
-                          )})
+
+            // CAP
+            this.cap({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y,
+              rot:hr,
+              len:this.genes.flowerLength*normRand(0.2, 1.2) + 70,
+              col:this.genes.innerColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
+              wid:(x) => capShape(x) * this.genes.flowerWidth*(sin(cos(x*PI/2),0.9)-cos(x*PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
+              ben:(x) => ([normRand(0, 0.2),normRand(0, 0.2),0]
+                  )})
 
         }
 
@@ -102,7 +80,7 @@ class Fungus extends Plant {
 
         this.addFilters(lay0,lay1);
 
-        this.position(lay0,lay1, 0, 0, "normal", "hard-light"); 
+        this.position(lay0,lay1, 0, 0, "normal", "normal"); 
         // this.position(lay1,lay1, 0, 0, "normal", "overlay"); 
         // this.position(lay0,lay1, 0, 0, "destination-over", "normal"); 
         
@@ -139,8 +117,8 @@ class Fungus extends Plant {
         P.push(disp);
       }
       var [L,R] = tubify({pts:P,wid:wid})
-      var wseg = 18;
-      var noiseScale = 22;
+      var wseg = 18 + Math.floor(seg/2) // Math.abs(this.dna.genes.flowerWidth/normRand(2,3)).toFixed(0);
+      var noiseScale = this.dna.genes.noiseScale ; 
       for (var i = 1; i < P.length; i++){
         for (var j = 1; j < wseg; j++){
           var m = (j-1)/(wseg-1);
@@ -152,35 +130,46 @@ class Fungus extends Plant {
           // m = sigmoid( ( m) * mCurve[0], mCurve[1]) * 0.7
  
             //Adds shading
-            var mCurve = this.curveCoeff2
-            var mx = sigmoid( m * mCurve[0], mCurve[1]) * 0.2
+          var mCurve = this.curveCoeff4
+          var mx = sigmoid( m * mCurve[0], mCurve[1]) * 2.2// * mCurve[0]/PI//* cos(PI/seg) * 0.09 * (0.7 )
 
-            var pcurve = this.curveCoeff4;
-            p = sigmoid( p * pcurve[0], pcurve[1]) * 0.7
-          // var ncurve = this.curveCoeff4;
-          // n = sigmoid( (j + n) * ncurve[0], ncurve[1]) * 2
+          var pcurve = this.curveCoeff0
+          var px = sigmoid( p * pcurve[0], pcurve[1]) * sin(PI/1*seg) //* mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
+
+          var ncurve = this.curveCoeff2
+          var nx = sin( ( n) * ncurve[0], ncurve[1]) //  * cos(PI/px) * 0.1//* (Math.PI/2) 
   
   
-          var p0 = v3.lerp(L[i-1],R[i-1],mx)
-          var p1 = v3.lerp(L[i],R[i],m)
+          var p0 = v3.lerp(L[i-1],R[i-1],m) //- mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
+          var p1 = v3.lerp(L[i],R[i],m) //- mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
     
           var p2 = v3.lerp(L[i-1],R[i-1],n)
           var p3 = v3.lerp(L[i],R[i],n)
-    
-          var lt = n/p
-          var h = lerpHue(col.min[0],col.max[0],lt)*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-          var s = mapval(lt,0,1,col.max[1],col.min[1])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-          var v = mapval(lt,0,1,col.min[2],col.max[2])*mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-          var a = mapval(lt,0,1,col.min[3],col.max[3])
-    
-          polygon({ctx:ctx,pts:[p0,p1,p3,p2],
 
-            xof:xof,yof:yof,fil:true,str:true,col:hsv(h,s,v,a)})
+          var pp0 = v3.lerp(L[i-1],R[i-1],m)
+          var pp1 = v3.lerp(L[i],R[i],m)
     
+          var pp2 = v3.lerp(L[i-1],R[i-1],n)
+          var pp3 = v3.lerp(L[i],R[i],n) 
+
+          var lt = sin((nx/p) * PI/2) * 0.5 + 0.1 
+
+          var h = lerpHue(col.min[0],col.max[0],lt) *mapval(Noise.noise(cos(p/noiseScale) * PI/2 * 0.5 + 0.5,m*noiseScale,n*noiseScale),0,1,0,1)
+          var s = mapval(lt,0,1,col.max[1],col.min[1])// *mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
+          var v = mapval(lt,0,1,col.min[2],col.max[2])// *mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
+          var a = mapval(lt,0.8,1,col.min[3],col.max[3])
+
+          console.log(s)
+          // console.log(col.min[0], col.max[0], h, lt, this.dna.color([h,s,v,a]).humanName)
+
+          polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+            xof:xof,yof:yof,fil:true,str:true,col:hsv(this.clamp(h,0, 359),this.clamp(s*0.8, 0,1),v,1)})
+          // polygon({ctx:ctx,pts:[pp1,pp1,pp3,pp2],
+            // xof:xof,yof:yof,fil:true,str:false,col:hsv(h,s,v,0.8)}) 
         }
       }
       stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
-      stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:rgba(0,0,0,0.5)})
+      stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:rgba(0,0,0,0.6)})
       return P
     }
       

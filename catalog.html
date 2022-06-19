@@ -24,48 +24,7 @@
     <script src="./classes/fungus.js"></script>
     <script src="./classes/descriptors/descriptor.js"></script>
     <script src="./classes/descriptors/colorRangeDescriptor.js"></script>
-    <style>
-        body {
-            font-family: 'Kristi', cursive;
-            color: #7A7658;
-            /* background-color: #FFFFFA; */
-        }
-        #load-text {
-        text-align: center;
-  font-family: 'Share', cursive;
-        }
-
-        .title h1 { 
-            font-size: 4em;
-            font-weight: 100;
-            color: #7A7658;
-        }
-        .title h5 {
-            font-size: 1.8em;
-            color: #7A7658;
-        }
-        .title h2 {
-            font-size: 2.6em;
-            font-weight: 800;
-            color: #7A7658;
-        }
-        .flower p {
-            font-family: 'Loved by the King', cursive;
-        }
-
-        .flower img {
-            padding-bottom: 1em;
-            min-width: 200px;
-            filter:  url(#warm-x-rays)  contrast(1) saturate(.99)
-        }
-        .flower a { 
-            text-decoration: none;
-            margin-bottom: 0em;
-            font-size: 1.9em !important;
-            font-weight: 100;
-            color: #767676;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body onload="catalog()">
 
@@ -160,7 +119,7 @@
             // add an h5 tag to each flower div and add the plant name to it from plantName().
             // var flowerDivs = document.getElementsByClassName("flower");
             var flora = document.getElementById('flora')
-            var numberOfFlora = 8;
+            var numberOfFlora = 16;
             for (var i = 0; i < numberOfFlora; i++) {
                 generate(getPlantType())
     
@@ -190,6 +149,14 @@
                     description.innerHTML = obj.reverse().join(" ")// [1] + obj[0];
                     infoContainer.appendChild(description);
                 })
+
+                var description = document.createElement("p");
+                    description.className = "text-start my-0 ms-2 test";
+                    description.innerHTML = plant.dna.genes.flowerColor.min.map(x => x.toFixed(3))
+                    description.innerHTML += "<br />"
+                    description.innerHTML += plant.dna.genes.flowerColor.max.map(x => x.toFixed(3))
+                
+                infoContainer.appendChild(description);
     
                 flowerContainer.appendChild(infoContainer);
     

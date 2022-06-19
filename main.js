@@ -584,8 +584,8 @@ function vizParams(PAR){
 
   function input(name, value, min=0, max=180, step=0.00000000000001) {
     var input = '<div class="input-group input-group-sm">'
-        input += '<input type="range" class="form-range" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
-        input += '<span class="small" id="'+name+'">' +value+'</span>';
+        input += '<input type="number" class="form-control" name="'+name+':number" value="'+value+'" min="'+min+'" step="'+step+'" max="'+max+'" oninput="this.nextElementSibling.innerText = this.value">';
+        // input += '<span class="small" id="'+name+'">' +value+'</span>';
         input += '</div>';
     return input
   }
@@ -880,8 +880,9 @@ function generate(plantType, dna){
   CTX.fillStyle =rgba(255,255,255,0);
   CTX.fillRect(0,0,CTX.canvas.width,CTX.canvas.height)
 
-  var plantType =(plantType !== undefined && plantType !== null) ? plantType : ["flower", "woody", "fungus"].sort(() => 0.5 - Math.random())[0];
+  var plantType =(plantType !== undefined && plantType !== null) ? plantType : randChoice(['flower', 'flower', 'woody', 'fungus']);
   console.log('generating...', plantType);
+
 
   let options = {ctx:CTX,xof:CANVAS_WIDTH/2,yof:CANVAS_WIDTH, dna: dna};
   switch(plantType){

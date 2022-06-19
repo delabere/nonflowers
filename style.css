@@ -10,11 +10,47 @@
 
 #canvas-container { width: 100%; }
 
-#load-text {
+.test {
+  font-family: 'Share', cursive !important;
+}
 
+body {
+  font-family: 'Kristi', cursive;
+  color: #7A7658;
+  /* background-color: #FFFFFA; */
+}
+#load-text {
   text-align: center;
   font-family: 'Share', cursive;
 }
 
+.title h1 { 
+  font-size: 4em;
+  font-weight: 100;
+  color: #7A7658;
+}
+.title h5 {
+  font-size: 1.8em;
+  color: #7A7658;
+}
+.title h2 {
+  font-size: 2.6em;
+  font-weight: 800;
+  color: #7A7658;
+}
+.flower p {
+  font-family: 'Loved by the King', cursive;
+}
 
-
+.flower img {
+  padding-bottom: 1em;
+  min-width: 200px;
+  filter:  url(#warm-x-rays)  contrast(1) saturate(.99)
+}
+.flower a { 
+  text-decoration: none;
+  margin-bottom: 0em;
+  font-size: 1.9em !important;
+  font-weight: 100;
+  color: #767676;
+}
