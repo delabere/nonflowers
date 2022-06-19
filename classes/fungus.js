@@ -159,7 +159,6 @@ class Fungus extends Plant {
           var v = mapval(lt,0,1,col.min[2],col.max[2])// *mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
           var a = mapval(lt,0.8,1,col.min[3],col.max[3])
 
-          console.log(s)
           // console.log(col.min[0], col.max[0], h, lt, this.dna.color([h,s,v,a]).humanName)
 
           polygon({ctx:ctx,pts:[p0,p1,p3,p2],
