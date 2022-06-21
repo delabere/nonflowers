@@ -28,16 +28,18 @@
             </div>
         </div>
 
-        <div class="row">
-            <div id="generator-container" class="col-md-12 d-flex justify-content-center">
-                <div id="canvas-container" class="d-flex justify-content-center"></div>
-            </div>
-        </div>
+
 
         <div class="row">
             <div id="render-object" class="col-md-12 d-flex justify-content-center">
 
                 
+            </div>
+        </div>
+
+        <div class="row">
+            <div id="generator-container" class="col-md-12 d-flex justify-content-center">
+                <div id="canvas-container" class="d-flex justify-content-center"></div>
             </div>
         </div>
     </div>
@@ -48,7 +50,7 @@
             x="0" y="0" height="100%" width="100%">
 
                 <feTurbulence baseFrequency="0.99"
-                numOctaves="3" stitchTiles="stitch" result="colorNoise" />
+                numOctaves="8" stitchTiles="stitch" result="colorNoise" />
                 <feDisplacementMap  in2="colorNoise" in="SourceGraphic"
                 scale="8" xChannelSelector="A" yChannelSelector="A" result="displacement"/>
 
@@ -63,18 +65,18 @@
 
         <filter id="aged" x="0" y="0" height="100%" width="100%" color-interpolation-filters="sRGB">
             
-            <feTurbulence baseFrequency="0.03"
-            numOctaves="2" stitchTiles="stitch" result="colorNoise" />
+            <feTurbulence baseFrequency=".052"
+            numOctaves="2" stitchTiles="nostitch" seed="12" result="colorNoise" />
 
             <feColorMatrix in="SourceGraphic" result="aged" type="matrix" 
             values="1 0 0 0 0 
                     0 0.95 0 0 0 
-                    0 0 0.8 0 0 
-                    0 0 0 0.8 0"
+                    0 0 0.78 0 0 
+                    0 0 0 0.87 0"
             />
 
-            <feComposite in="SourceGraphic" in2="colorNoise" result="dG" operator="in" />
-            <feBlend in="aged" in2="dG" result="displaced" mode="overlay" />
+            <feComposite in="SourceAlpha" in2="colorNoise" result="dG" operator="in" />
+            <feBlend in="aged" in2="dG" result="displaced" mode="screen" />
 
         </filter>
     </svg>

@@ -81,7 +81,7 @@ export class Drawable {
         this.clear();
         var [lay0, lay1] = this.layers.slice(0,2);
 
-        this.position(lay0,lay1);
+        this.position(lay0,lay1, 0, 0, "normal", "normal");
 
         if(this.FILTERING_ENABLED) {
             Layer.filter(this.ctx,Filter.fade); //blotches
