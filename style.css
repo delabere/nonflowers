@@ -45,7 +45,7 @@ body {
 .flower img {
   padding-bottom: 1em;
   min-width: 200px;
-  /* filter: url(#smudge) url(#aged); */
+  filter: url(#smudge) url(#aged);
 }
 
 .flower a { 
