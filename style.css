@@ -45,11 +45,9 @@ body {
 .flower img {
   padding-bottom: 1em;
   min-width: 200px;
-   /* contrast(1) saturate(.99) */
+  /* filter: url(#smudge) url(#aged); */
 }
-/* .flower img:after {
-  filter:  url('#noiseFilter');
-} */
+
 .flower a { 
   text-decoration: none;
   margin-bottom: 0em;

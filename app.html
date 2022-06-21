@@ -43,34 +43,44 @@
         </div>
     </div>
 
+    <svg xmlns="http://www.w3.org/2000/svg"> 
+        <filter id="smudge" 
+            color-interpolation-filters="sRGB"
+            x="0" y="0" height="100%" width="100%">
 
-    <svg xmlns="http://www.w3.org/2000/svg">
-        <filter id="warm-x-rays" x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feColorMatrix type="matrix" values="1 0 0 0 0
-        1 0 0 0 0
-        1 0 0 0 0
-        0 0 0 1 0" in="SourceGraphic" result="colormatrix"></feColorMatrix>
+                <feTurbulence baseFrequency="0.07"
+                numOctaves="1" stitchTiles="stitch" result="colorNoise" />
+                <feDisplacementMap in2="colorNoise" in="SourceGraphic"
+                scale="11" xChannelSelector="A" yChannelSelector="A" result="displacement"/>
 
 
-            <feComponentTransfer in="colormatrix" result="componentTransfer">
-                <feFuncR type="table" tableValues="0.98 0.75 0.51"></feFuncR>
-                <feFuncG type="table" tableValues="1 0.45 0.11"></feFuncG>
-                <feFuncB type="table" tableValues="0.91 0.39 0.29"></feFuncB>
-                <feFuncA type="table" tableValues="0 0.9"></feFuncA>
-            </feComponentTransfer>
-            <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="6"></feGaussianBlur>
-            <feOffset dx="0" dy="0"></feOffset>
-            <feMerge result="merged">
-                
-                <feMergeNode></feMergeNode><feMergeNode in="blur"></feMergeNode>
-            </feMerge>
+                <feBlend in="SourceAlpha"  in2="displacement" result="displaced" mode="multiply" />
+
+                <feMerge >
+                    <feMergeNode in="SourceGraphic"/>
+                    <feMergeNode in="displaced"/>
+
+                </feMerge>
+
+        </filter>
+
+        <filter id="aged" x="0" y="0" height="100%" width="100%" color-interpolation-filters="sRGB">
             
-            <feBlend mode="darken" in="componentTransfer" in2="SourceGraphic" result="blend"></feBlend>
-            <feBlend mode="multiply" in="componentTransfer" in2="merged" result="blend2"></feBlend>
-            <feComposite operator="arithmetic" k1=".00219" k2=".02" k3=".015" k4=".125" in2="blend" result="lit"></feComposite>
-            <feBlend mode="screen" in="lit" in2="SourceGraphic" result="de"></feBlend>
+            <feTurbulence baseFrequency="0.03"
+            numOctaves="2" stitchTiles="stitch" result="colorNoise" />
+
+            <feColorMatrix in="SourceGraphic" result="aged" type="matrix" 
+            values="1 0 0 0 0 
+                    0 0.95 0 0 0 
+                    0 0 0.8 0 0 
+                    0 0 0 0.8 0"
+            />
+
+            <feComposite in="SourceGraphic" in2="colorNoise" result="dG" operator="in" />
+            <feBlend in="aged" in2="dG" result="displaced" mode="overlay" />
 
         </filter>
     </svg>
+
 </body>
 </html>
