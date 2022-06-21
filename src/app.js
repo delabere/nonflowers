@@ -49,7 +49,13 @@ class Generator {
 
     _ANIMATE(timeElapsed) {
 
-        let options = {width: this.CANVAS_WIDTH, height: this.CANVAS_HEIGHT, xof:this.CANVAS_WIDTH/2,yof:this.CANVAS_WIDTH};
+        let options = {
+                width: this.CANVAS_WIDTH,
+                height: this.CANVAS_HEIGHT, 
+                xof:this.CANVAS_WIDTH/2,
+                yof:this.CANVAS_WIDTH,
+                filtering_enabled: false
+            };
 
         if(this.configuration.has('seed'))
             options.dna = new DNA({seed: this.configuration.get('seed')});

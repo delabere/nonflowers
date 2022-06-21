@@ -29,6 +29,7 @@ export class Plant extends Drawable {
         this.width = (args.width != undefined) ? args.width : 0;
         this.height = (args.height != undefined) ? args.height: 0;
         this.dna = (args.dna != undefined) ? args.dna : new DNA();
+        this.filtering_enabled = (args.filtering_enabled != undefined) ? args.filtering_enabled : true;
             
     }
     clamp(num, min, max) {

@@ -5,7 +5,7 @@ export class Drawable {
 
     layers = [];
 
-    FILTERING_ENABLED = false;
+    FILTERING_ENABLED = true;
 
     constructor(w,h) {
 
@@ -13,6 +13,10 @@ export class Drawable {
         this.CANVAS_HEIGHT = h;
         
         this._ctx = new Layer(w,h); 
+    }
+
+    set filtering_enabled(bool) {
+        this.FILTERING_ENABLED = bool;
     }
 
     set width(w) {
