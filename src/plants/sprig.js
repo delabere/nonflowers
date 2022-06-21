@@ -1,4 +1,9 @@
-class Sprig extends Plant {
+import {Plant} from './plants.js';
+import {Layer} from './../app/layer.js';
+import {Noise} from './../app/noise.js';
+import {Util} from './../app/util.js';
+
+export class Sprig extends Plant {
 
     type = "sprig";
 
@@ -14,8 +19,8 @@ class Sprig extends Plant {
         var PAR = (args.PAR != undefined) ? args.PAR : genParams();
       
         var cwid = 1200
-        var lay0 = Layer.empty(cwid)
-        var lay1 = Layer.empty(cwid)
+        var lay0 = new Layer(cwid)
+        var lay1 = new Layer(cwid)
       
         PAR.branchFork = 0.0
         PAR.branchTwist = 0.01
@@ -65,20 +70,7 @@ class Sprig extends Plant {
             }
         }
       
-        doFilters(lay0,lay1);
       
-        var b1 = Layer.boundingBox(lay0)
-        var b2 = Layer.boundingBox(lay1)
-        var bd = {
-          xmin:Math.min(b1.xmin,b2.xmin),
-          xmax:Math.max(b1.xmax,b2.xmax),
-          ymin:Math.min(b1.ymin,b2.ymin),
-          ymax:Math.max(b1.ymax,b2.ymax)
-        }
-        var xref = xof-(bd.xmin+bd.xmax)/2
-        var yref = yof-bd.ymax
-        Layer.blit(ctx,lay0,{ble:"multiply",xof:xref,yof:yref})
-        Layer.blit(ctx,lay1,{ble:"normal",xof:xref,yof:yref})
-      
+        this.draw();      
       }
 }

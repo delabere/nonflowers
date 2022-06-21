@@ -27,8 +27,6 @@ for (var i = 1; i < 4; i++){
 }
 
 // math constants
-var rad2deg = 180/Math.PI
-var deg2rad = Math.PI/180
 var PI = Math.PI
 var sin = Math.sin
 var cos = Math.cos
@@ -724,21 +722,9 @@ var Filter = new function(){
 
 function createCanvas(w,h) {
   var canvas = document.createElement('canvas');
-  // if (typeof OffscreenCanvas !== "undefined") {
-  //   var offscreenCanvas = new OffscreenCanvas(w,h);
-  // // } else {
-  //   canvas.width = w;
-  //   canvas.height = h;
-  // }
-  // var offscreenCanvas =
-  // 'OffscreenCanvas' in window
-  //   ? canvas.transferControlToOffscreen()
-  //   : canvas; 
-  //   canvas.style = {width: w, height: h};
-    canvas.width = w;
-    canvas.height = h;
+      canvas.width = w;
+      canvas.height = h;
   return canvas.getContext('2d');
-  
 }
 // canvas context operations
 var Layer = new function(){

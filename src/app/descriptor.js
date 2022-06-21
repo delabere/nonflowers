@@ -1,4 +1,4 @@
-class Descriptor {
+export class Descriptor {
 
     constructor(str) {
         this.str = str;

@@ -1,4 +1,5 @@
-class ColorRangeDescriptor extends Descriptor {
+import { Descriptor } from "./descriptor.js";
+export class ColorRangeDescriptor extends Descriptor {
 
     constructor(args) {
         super();
