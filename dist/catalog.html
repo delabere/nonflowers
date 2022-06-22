@@ -1,0 +1,85 @@
+<!-- an HTML page with latest Bootstrap boilerplate with the title "Flora of Verilin" -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Flora of Verilin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"> 
+    <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&family=Share&display=swap" rel="stylesheet"> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.2.1/jquery.serializejson.min.js" integrity="sha512-SdWDXwOhhVS/wWMRlwz3wZu3O5e4lm2/vKK3oD0E5slvGFg/swCYyZmts7+6si8WeJYIUsTrT3KZWWCknSopjg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://kit.fontawesome.com/0cf67825f6.js" crossorigin="anonymous"></script>
+
+
+    <script src="./app.js" type="module"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head> 
+<body>
+
+    <div class="container-fluid px-5">
+        <div class="row">
+            <div class="title col-md-12 mt-2 mb-0 text-center">
+                <h1 class="lh-1 my-0">Flora of Verilin</h1>
+                <h5 class="lh-1 my-0">"in and around "</h5>
+                <h2 class="lh-1 mt-0 mb-0">Dilent Province</h2>
+            </div>
+        </div>
+
+        <div class="sticky-top sticky">
+            <div id="render-object" class="row"></div>
+        </div>
+
+        <div class="ui-component" id="gene-editor-component"></div>
+
+        <div class="row">
+            <div id="generator-container" class="col-md-12 d-flex justify-content-center">
+                <div id="canvas-container" class="d-flex justify-content-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <svg xmlns="http://www.w3.org/2000/svg"> 
+        <filter id="smudge" 
+            color-interpolation-filters="sRGB"
+            x="0" y="0" height="100%" width="100%">
+
+                <feTurbulence baseFrequency="0.99"
+                numOctaves="8" stitchTiles="stitch" result="colorNoise" />
+                <feDisplacementMap  in2="colorNoise" in="SourceGraphic"
+                scale="8" xChannelSelector="A" yChannelSelector="A" result="displacement"/>
+
+
+                <feComposite in="displaced" in2="SourceGraphic" result="dG" operator="atop" />
+                <feMerge >
+                    <feMergeNode in="SourceGraphic"/>
+                    <feMergeNode in="dG"/>
+                </feMerge>
+
+        </filter>
+
+        <filter id="aged" x="0" y="0" height="100%" width="100%" color-interpolation-filters="sRGB">
+            
+            <feTurbulence baseFrequency=".032"
+            numOctaves="2" stitchTiles="nostitch" seed="12" result="colorNoise" />
+
+            <feColorMatrix in="SourceGraphic" result="aged" type="matrix" 
+            values="1 0 0 0 0 
+                    0 0.95 0 0 0 
+                    0 0 0.78 0 0 
+                    0 0 0 0.87 0"
+            />
+
+            <feComposite in="SourceAlpha" in2="colorNoise" result="dG" operator="in" />
+            <feBlend in="aged" in2="dG" result="displaced" mode="screen" />
+
+        </filter>
+    </svg>
+
+</body>
+</html>

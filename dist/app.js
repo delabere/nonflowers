@@ -1842,10 +1842,10 @@
       }
 
 
-      render(plant) {
+      render(plant, className = 'col-md-8') {
 
           var flowerContainer = document.createElement('div');
-              flowerContainer.className = "col-md-6 flower mb-4";
+              flowerContainer.className = className + " flower mb-4";
               flowerContainer.id = plant.seed;
 
           var plantImg = document.createElement('img');
@@ -1860,7 +1860,7 @@
           var h5 = document.createElement("a");
               h5.className = "";
               h5.innerHTML = plant.name;
-              h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type;
+              h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type + "&plantCount=1";
               h5.target = "_blank";
 
           infoContainer.appendChild(h5);
@@ -4252,25 +4252,35 @@
                   filtering_enabled: false
               };
 
-          console.log(this.geneEditor.dna);
-          if(this.geneEditor.isEmpty) {
-              console.log("EDITING", this.geneEditor.dna);
-              options.dna = new DNA(this.geneEditor.dna);
-          }else {
-              console.log("NEW");
-              options.dna = new DNA(options);
+          let plantCount = this.configuration.get("plantCount") || 1;
+          let renderObject = document.getElementById('render-object');
+          for(var i = 0; i < plantCount; i++) {
+              if(this.geneEditor.isEmpty) {
+                  console.log("EDITING", this.geneEditor.dna);
+                  options.dna = new DNA(this.geneEditor.dna);
+                  renderObject.innerHTML = "";
+              }else {
+                  console.log("NEW");
+                  options.dna = new DNA(options);
+              }
+
+
+              const plant = new PlantFactory(options, this.configuration.get('plantType'));
+                  console.log("Generating", plant);
+                  plant.generate({containerElementId: 'canvas-container'});
+                      
+              if(plantCount == 1) {
+                  this.geneEditor.render(plant.dna.genes);
+                  var perRow = 8;
+              }else {
+                  var perRow = 4;
+              }
+
+
+              // This contains the entire plant image and name
+              const name = new nameComponent({containerElementId: 'render-object'});
+                    name.render(plant, "col-md-" + perRow);
           }
-
-          document.getElementById('render-object').innerHTML = "";
-
-          const plant = new PlantFactory(options, this.configuration.get('plantType'));
-                console.log("Generating", plant);
-                plant.generate({containerElementId: 'canvas-container'});
-                  
-          this.geneEditor.render(plant.dna.genes);
-
-          const name = new nameComponent({containerElementId: 'render-object'});
-                name.render(plant);
 
 
       }

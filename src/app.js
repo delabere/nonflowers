@@ -66,29 +66,34 @@ class Generator {
             };
 
         let plantCount = this.configuration.get("plantCount") || 1;
-
+        let renderObject = document.getElementById('render-object');
         for(var i = 0; i < plantCount; i++) {
-            let plant = PlantFactory.CreatePlant(options);
-            plant.render(this.canvas);
-        if(this.geneEditor.isEmpty) {
-            console.log("EDITING", this.geneEditor.dna)
-            options.dna = new DNA(this.geneEditor.dna);
-        }else{
-            console.log("NEW")
-            options.dna = new DNA(options);
+            if(this.geneEditor.isEmpty) {
+                console.log("EDITING", this.geneEditor.dna)
+                options.dna = new DNA(this.geneEditor.dna);
+                renderObject.innerHTML = "";
+            }else{
+                console.log("NEW")
+                options.dna = new DNA(options);
+            }
+
+
+            const plant = new PlantFactory(options, this.configuration.get('plantType'));
+                console.log("Generating", plant)
+                plant.generate({containerElementId: 'canvas-container'});
+                    
+            if(plantCount == 1) {
+                this.geneEditor.render(plant.dna.genes);
+                var perRow = 8;
+            }else{
+                var perRow = 4
+            }
+
+
+            // This contains the entire plant image and name
+            const name = new nameComponent({containerElementId: 'render-object'});
+                  name.render(plant, "col-md-" + perRow);
         }
-
-        document.getElementById('render-object').innerHTML = "";
-
-        const plant = new PlantFactory(options, this.configuration.get('plantType'));
-              console.log("Generating", plant)
-              plant.generate({containerElementId: 'canvas-container'});
-                
-        this.geneEditor.render(plant.dna.genes);
-
-        const name = new nameComponent({containerElementId: 'render-object'});
-              name.render(plant);
-    }
 
 
     }

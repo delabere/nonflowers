@@ -4,10 +4,10 @@ export class nameComponent {
     }
 
 
-    render(plant) {
+    render(plant, className = 'col-md-8') {
 
         var flowerContainer = document.createElement('div');
-            flowerContainer.className = "col-md-6 flower mb-4";
+            flowerContainer.className = className + " flower mb-4";
             flowerContainer.id = plant.seed;
 
         var plantImg = document.createElement('img')
@@ -22,7 +22,7 @@ export class nameComponent {
         var h5 = document.createElement("a");
             h5.className = ""
             h5.innerHTML = plant.name;
-            h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type;
+            h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type + "&plantCount=1";
             h5.target = "_blank";
 
         infoContainer.appendChild(h5);
