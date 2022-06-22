@@ -9,176 +9,77 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"> 
     <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&family=Share&display=swap" rel="stylesheet"> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.2.1/jquery.serializejson.min.js" integrity="sha512-SdWDXwOhhVS/wWMRlwz3wZu3O5e4lm2/vKK3oD0E5slvGFg/swCYyZmts7+6si8WeJYIUsTrT3KZWWCknSopjg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://kit.fontawesome.com/0cf67825f6.js" crossorigin="anonymous"></script>
-    <!-- Include name that color library -->
-    <script src="./node_modules/named-web-colors/lib/named-web-colors.js"></script>
-    <script src="./node_modules/colortranslator/dist/web/colortranslator.js"></script>
-    <script src="./main.js"></script>
-    <script src="./classes/color.js"></script>
-    <script src="./classes/dna.js"></script>
-    <script src="./classes/plant.js"></script>
-    <script src="./classes/flowering.js"></script>
-    <script src="./classes/woody.js"></script>
-    <script src="./classes/fungus.js"></script>
-    <script src="./classes/descriptors/descriptor.js"></script>
-    <script src="./classes/descriptors/colorRangeDescriptor.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-</head>
-<body onload="catalog()">
 
-    <div class="position-absolute top-50 start-50 translate-middle" id="loader">
-        <div id="spinner" class="text-center">
-            <i class="fa-3x fa-duotone fa-hand-holding-seedling fa-beat" style="--fa-beat-scale: 1.3; --fa-animation-duration: 2s;"></i>
-            <div id="load-text" class="ps-1 pt-4">Growing Specimens...&nbsp;&nbsp;&nbsp;</div>
-        </div>
-    </div>
+
+    <script src="./dist/app.js" type="module"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head> 
+<body>
 
     <div class="container-fluid px-5">
         <div class="row">
-            <div class="title col-md-12 mt-5 mb-0 text-center">
+            <div class="title col-md-12 mt-2 mb-0 text-center">
                 <h1 class="lh-1 my-0">Flora of Verilin</h1>
                 <h5 class="lh-1 my-0">"in and around "</h5>
-                <h2 class="lh-1 mt-0 mb-5">Dilent Province</h2>
+                <h2 class="lh-1 mt-0 mb-0">Dilent Province</h2>
             </div>
         </div>
 
-        <div class="row">
-            <div id="flora" class="row">
+        <div class="sticky-top sticky">
+            <div id="render-object" class="row"></div>
+        </div>
 
+        <div class="ui-component" id="gene-editor-component"></div>
+
+        <div class="row">
+            <div id="generator-container" class="col-md-12 d-flex justify-content-center">
+                <div id="canvas-container" class="d-flex justify-content-center"></div>
             </div>
         </div>
     </div>
 
-    <svg>
-        <filter id='noiseFilter'>
-          <feTurbulence 
-            type='fractalNoise' 
-            baseFrequency='2.29' 
-            numOctaves='2' 
-            stitchTiles='stitch'/>
+    <svg xmlns="http://www.w3.org/2000/svg"> 
+        <filter id="smudge" 
+            color-interpolation-filters="sRGB"
+            x="0" y="0" height="100%" width="100%">
+
+                <feTurbulence baseFrequency="0.99"
+                numOctaves="8" stitchTiles="stitch" result="colorNoise" />
+                <feDisplacementMap  in2="colorNoise" in="SourceGraphic"
+                scale="8" xChannelSelector="A" yChannelSelector="A" result="displacement"/>
+
+
+                <feComposite in="displaced" in2="SourceGraphic" result="dG" operator="atop" />
+                <feMerge >
+                    <feMergeNode in="SourceGraphic"/>
+                    <feMergeNode in="dG"/>
+                </feMerge>
+
         </filter>
-      </svg>
-    <!--
-<svg xmlns="http://www.w3.org/2000/svg">
-    <filter id="x-rays" x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-        <feColorMatrix type="matrix" values="1 0 0 0 0
-    1 0 0 0 0
-    1 0 0 0 0
-    0 0 0 1 0" in="SourceGraphic" result="colormatrix"/>
-        <feComponentTransfer in="colormatrix" result="componentTransfer">
-                <feFuncR type="table" tableValues="0.98 0.3 0.25"/>
-            <feFuncG type="table" tableValues="1 0.44 0.24"/>
-            <feFuncB type="table" tableValues="0.91 0.62 0.39"/>
-            <feFuncA type="table" tableValues="0 0.3"/>
-          </feComponentTransfer>
-        <feBlend mode="overlay" in="componentTransfer" in2="SourceGraphic" result="blend"/>
-    </filter>
-    </svg>
 
-    <svg xmlns="http://www.w3.org/2000/svg">
-        <filter id="warm-x-rays" x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feColorMatrix type="matrix" values="1 0 0 0 0
-        1 0 0 0 0
-        1 0 0 0 0
-        0 0 0 1 0" in="SourceGraphic" result="colormatrix"></feColorMatrix>
-
-
-            <feComponentTransfer in="colormatrix" result="componentTransfer">
-                <feFuncR type="table" tableValues="0.98 0.75 0.51"></feFuncR>
-                <feFuncG type="table" tableValues="1 0.45 0.11"></feFuncG>
-                <feFuncB type="table" tableValues="0.91 0.39 0.29"></feFuncB>
-                <feFuncA type="table" tableValues="0 0.9"></feFuncA>
-            </feComponentTransfer>
-            <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="6"></feGaussianBlur>
-            <feOffset dx="0" dy="0"></feOffset>
-            <feMerge result="merged">
-                
-                <feMergeNode></feMergeNode><feMergeNode in="blur"></feMergeNode>
-            </feMerge>
+        <filter id="aged" x="0" y="0" height="100%" width="100%" color-interpolation-filters="sRGB">
             
-            <feBlend mode="darken" in="componentTransfer" in2="SourceGraphic" result="blend"></feBlend>
-            <feBlend mode="multiply" in="componentTransfer" in2="merged" result="blend2"></feBlend>
-            <feComposite operator="arithmetic" k1=".00219" k2=".02" k3=".015" k4=".125" in2="blend" result="lit"></feComposite>
-            <feBlend mode="screen" in="lit" in2="SourceGraphic" result="de"></feBlend>
+            <feTurbulence baseFrequency=".032"
+            numOctaves="2" stitchTiles="nostitch" seed="12" result="colorNoise" />
+
+            <feColorMatrix in="SourceGraphic" result="aged" type="matrix" 
+            values="1 0 0 0 0 
+                    0 0.95 0 0 0 
+                    0 0 0.78 0 0 
+                    0 0 0 0.87 0"
+            />
+
+            <feComposite in="SourceAlpha" in2="colorNoise" result="dG" operator="in" />
+            <feBlend in="aged" in2="dG" result="displaced" mode="screen" />
 
         </filter>
     </svg>
-    <svg xmlns="http://www.w3.org/2000/svg">
-        <filter id="dark-green-sepia" x="-10%" y="-10%" width="120%" height="120%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feColorMatrix type="matrix" values="1 0 0 0 0
-        1 0 0 0 0
-        1 0 0 0 0
-        0 0 0 1 0" in="SourceGraphic" result="colormatrix"/>
-            <feComponentTransfer in="colormatrix" result="componentTransfer">
-                    <feFuncR type="table" tableValues="0.25 0.39 0.96"/>
-                <feFuncG type="table" tableValues="0.16 0.52 0.97"/>
-                <feFuncB type="table" tableValues="0.06 0.39 0.78"/>
-                <feFuncA type="table" tableValues="0 .4"/>
-              </feComponentTransfer>
-            <feBlend mode="overlay" in="componentTransfer" in2="SourceGraphic" result="blend"/>
-        </filter>    
-    </svg>  
-    <svg viewBox='0 0 243 243' xmlns='http://www.w3.org/2000/svg'>
-        <filter id='noiseFilter'>
-            <feTurbulence type='fractalNoise' baseFrequency='1.3'/>
-        </filter>
 
-        <rect width='100%' height='100%' filter='url(#noiseFilter)'/>
-    </svg>
--->
-    <script type="text/javascript">
-    function catalog() {
-        (function() {
-
-    
-            // add an h5 tag to each flower div and add the plant name to it from plantName().
-            // var flowerDivs = document.getElementsByClassName("flower");
-            var flora = document.getElementById('flora')
-            var numberOfFlora = 16;
-            for (var i = 0; i < numberOfFlora; i++) {
-                generate(getPlantType())
-    
-                var flowerContainer = document.createElement('div');
-                    flowerContainer.className = "col-md-3 flower mb-4";
-                    flowerContainer.id = plant.seed;
-                var plantImg = document.createElement('img')
-                    plantImg.src = CTX.canvas.toDataURL('image/png');
-                    plantImg.className = "img-fluid";
-    
-                flowerContainer.appendChild(plantImg);
-    
-                var infoContainer = document.createElement('div');
-                    infoContainer.className = "col-md-8 col-sm-6 mx-auto";
-    
-                var h5 = document.createElement("a");
-                    h5.className = ""
-                    h5.innerHTML = plant.name;
-                    h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type;
-                    h5.target = "_blank";
-    
-                infoContainer.appendChild(h5);
-    
-                Object.entries(plant.description).map(obj => {
-                    var description = document.createElement("p");
-                    description.className = "text-start my-0 ms-2";
-                    description.innerHTML = obj.reverse().join(" ")// [1] + obj[0];
-                    infoContainer.appendChild(description);
-                })
-
-     
-    
-                flowerContainer.appendChild(infoContainer);
-    
-                flora.appendChild(flowerContainer);
-    
-            }
-    
-            document.getElementById("loader").style.display = "none";
-        })();
-    }
-    </script> 
- 
 </body>
 </html>
