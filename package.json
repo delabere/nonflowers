@@ -4,25 +4,30 @@
   "description": "Procedurally generated paintings of nonexistent flowers in Gongbi style for the browser. Generate your own online at https://lingdong-.github.io/nonflowers/.",
   "main": "main.js",
   "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup watch -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LingDong-/nonflowers.git"
+    "url": "git+https://github.com/esmarkowski/nonflowers.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/LingDong-/nonflowers/issues"
+    "url": "https://github.com/esmarkowski/nonflowers/issues"
   },
-  "homepage": "https://github.com/LingDong-/nonflowers#readme",
+  "homepage": "https://github.com/esmarkowski/nonflowers#readme",
   "dependencies": {
+    "@jaames/iro": "^5.5.2",
     "colortranslator": "^1.9.2",
     "named-web-colors": "^1.4.2",
-    "quick-perlin-noise-js": "^1.0.3",
+    "seedrandom": "^3.0.5",
     "watch": "^1.0.2"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "rollup": "^2.75.7",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0"
   }

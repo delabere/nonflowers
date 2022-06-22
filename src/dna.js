@@ -10,7 +10,7 @@ export class DNA {
           this.seed = DNA.newSeed(); // This function should migrate into DNA
         }else if( typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
           console.log('genes seed', genes.seed)
-          this.seed = genes.seed.toString(); // This function should migrate into DNA
+          this.seed = genes.seed.toString();
         }
         Math.seed(this.seed);
         PAR.seed = Number(this.seed);

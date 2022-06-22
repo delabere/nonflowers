@@ -32,7 +32,7 @@ export class Flowering extends Plant {
 
         // start drawing at
         let x0 = this.width*0.5;
-        let y0 = this.height*0.9; 
+        let y0 = this.height*0.8; 
             
         for (var i = 0; i < this.genes.stemCount; i++){
 

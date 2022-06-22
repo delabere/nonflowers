@@ -8,9 +8,13 @@
   box-shadow: 1px 1px 1px #11111122;
 }
 
+.swatch { 
+  width: 32px;
+  height: 18px;
+}
 #flora-container { width: 100%; }
 
-.test {
+.ui-component, .input-group {
   font-family: 'Share', cursive !important;
 }
 
@@ -24,17 +28,23 @@ body {
   font-family: 'Share', cursive;
 }
 
+.sticky {z-index: 800;}
+.ui-component { z-index: 900;position:relative;}
+
+#render-object { 
+  margin-top: -3em;
+}
 .title h1 { 
-  font-size: 4em;
+  font-size: 3em;
   font-weight: 100;
   color: #7A7658;
 }
 .title h5 {
-  font-size: 1.8em;
+  font-size: 1.4em;
   color: #7A7658;
 }
 .title h2 {
-  font-size: 2.6em;
+  font-size: 1.6em;
   font-weight: 800;
   color: #7A7658;
 }
@@ -51,7 +61,7 @@ body {
 .flower a { 
   text-decoration: none;
   margin-bottom: 0em;
-  font-size: 3.9em !important;
+  font-size: 2.9em !important;
   font-weight: 100;
   color: #767676;
 }

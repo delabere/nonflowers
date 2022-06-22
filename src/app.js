@@ -5,14 +5,20 @@ import {Util} from './app/util.js';
 import {Prng} from './app/prng.js';
 import {DNA} from './dna.js';
 import {nameComponent} from './app/nameComponent.js';
-import * as seedrandom from 'https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js';
+import * as seedrandom from 'seedrandom/seedrandom.js'
+import { GeneEditorComponent } from './app/geneEditorComponent.js';
+
 
 let _APP = null;
 
 window.addEventListener('DOMContentLoaded', () => {
-  _APP = new Generator();
+    _APP = new Generator();
 
 
+    _APP.geneEditor.addEventListener('editor.change', function(evt) {
+        // evt.detail;
+        _APP.OnChange();
+    });
 //   const inputs = document.querySelectorAll('input');
 //   inputs.forEach(i => {
 //     i.onchange = () => {
@@ -31,19 +37,20 @@ class Generator {
         this._configuration = (v) => (new URLSearchParams(window.location.search)); 
         
 
+        this.geneEditor = new GeneEditorComponent({elementId: 'gene-editor-component'});
 
         this.OnChange()
     }
 
     OnChange() {
         this._UpdateFromUI();
+        this._ANIMATE();
     }
 
     _UpdateFromUI() {
 
-        var rng = new Math.seedrandom(); // call with new to create a standalone generator without affecting Math.random() yet.
+        let rng = new Math.seedrandom(); // call with new to create a standalone generator without affecting Math.random() yet.
         Math.seed = function(x) { return Math.seedrandom(x); }
-        this._ANIMATE();
 
     }
 
@@ -54,23 +61,33 @@ class Generator {
                 height: this.CANVAS_HEIGHT, 
                 xof:this.CANVAS_WIDTH/2,
                 yof:this.CANVAS_WIDTH,
+                seed: this.configuration.get('seed'),
                 filtering_enabled: false
             };
 
-        if(this.configuration.has('seed'))
-            options.dna = new DNA({seed: this.configuration.get('seed')});
+        console.log(this.geneEditor.dna)
+        if(this.geneEditor.isEmpty) {
+            console.log("EDITING", this.geneEditor.dna)
+            options.dna = new DNA(this.geneEditor.dna);
+        }else{
+            console.log("NEW")
+            options.dna = new DNA(options);
+        }
+
+        document.getElementById('render-object').innerHTML = "";
 
         const plant = new PlantFactory(options, this.configuration.get('plantType'));
+              console.log("Generating", plant)
               plant.generate({containerElementId: 'canvas-container'});
                 
+        this.geneEditor.render(plant.dna.genes);
 
         const name = new nameComponent({containerElementId: 'render-object'});
               name.render(plant);
 
 
-        console.log(plant)
-
     }
+
 
 
 

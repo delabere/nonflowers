@@ -1,7 +1,7 @@
 import {Util} from "./util.js";
-import {ColorTranslator} from 'https://cdn.jsdelivr.net/npm/colortranslator/+esm';
-import * as NWC from 'https://unpkg.com/named-web-colors@1.4.2/lib/named-web-colors.js' // ../../node_modules/named-web-colors/lib/named-web-colors.js';
-// import { ColorTranslator, Harmony, Mix } from 'colortranslator';
+// import * as ColorTranslator from 'colortranslator'// https://cdn.jsdelivr.net/npm/colortranslator/+esm';
+import * as NWC from 'named-web-colors'; // ../../node_modules/named-web-colors/lib/named-web-colors.js';
+import { ColorTranslator} from 'colortranslator';
 export class Color {
     constructor(colorStr, colorSpace = 'werner') {
 
@@ -12,7 +12,13 @@ export class Color {
 
     // color = hsv(...this.colorStr))
     get humanName() {
-        return getColorName( ColorTranslator.toHEX(this.colorStr), {list: this.colorSpace}).name;
+
+        return getColorName( ColorTranslator.toHEXA(this.colorStr), {list: this.colorSpace}).name;
+    }
+
+    static toHSLA(arr) {
+        var hsl = Util.hsv(...arr);
+        return hsl
     }
 
     static fromHSLA(arr) {

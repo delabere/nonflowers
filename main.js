@@ -914,7 +914,7 @@ function load(){
   // makeBG()
   setTimeout(_load,100)
   function _load(){
-    let modifiedDNA = $('#dna-form').serializeJSON({});
+    let modifiedDNA = $('#dna-form').serializeJSON({parseNumbers: true});
     let options;
     if(Object.keys(modifiedDNA).length !== 0 && plant.seed !== undefined) {
       modifiedDNA.seed = plant.seed || getSeed();

@@ -11,9 +11,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"> 
     <link href="https://fonts.googleapis.com/css2?family=Kristi&family=Loved+by+the+King&family=Share&display=swap" rel="stylesheet"> 
-    <!-- <script src="https://kit.fontawesome.com/0cf67825f6.js" crossorigin="anonymous"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.2.1/jquery.serializejson.min.js" integrity="sha512-SdWDXwOhhVS/wWMRlwz3wZu3O5e4lm2/vKK3oD0E5slvGFg/swCYyZmts7+6si8WeJYIUsTrT3KZWWCknSopjg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://kit.fontawesome.com/0cf67825f6.js" crossorigin="anonymous"></script>
 
-    <script src="./src/app.js" type="module"></script>
+
+    <script src="./app.js" type="module"></script>
 
     <link rel="stylesheet" type="text/css" href="style.css">
 </head> 
@@ -21,21 +24,20 @@
 
     <div class="container-fluid px-5">
         <div class="row">
-            <div class="title col-md-12 mt-5 mb-0 text-center">
+            <div class="title col-md-12 mt-2 mb-0 text-center">
                 <h1 class="lh-1 my-0">Flora of Verilin</h1>
                 <h5 class="lh-1 my-0">"in and around "</h5>
-                <h2 class="lh-1 mt-0 mb-5">Dilent Province</h2>
+                <h2 class="lh-1 mt-0 mb-0">Dilent Province</h2>
             </div>
         </div>
 
 
 
-        <div class="row">
-            <div id="render-object" class="col-md-12 d-flex justify-content-center">
-
-                
-            </div>
+        <div class="sticky-top sticky">
+            <div id="render-object" class="col-lg-10 col-md-11 mx-auto d-flex justify-content-center"></div>
         </div>
+
+        <div class="ui-component" id="gene-editor-component"></div>
 
         <div class="row">
             <div id="generator-container" class="col-md-12 d-flex justify-content-center">
@@ -65,7 +67,7 @@
 
         <filter id="aged" x="0" y="0" height="100%" width="100%" color-interpolation-filters="sRGB">
             
-            <feTurbulence baseFrequency=".052"
+            <feTurbulence baseFrequency=".032"
             numOctaves="2" stitchTiles="nostitch" seed="12" result="colorNoise" />
 
             <feColorMatrix in="SourceGraphic" result="aged" type="matrix" 
