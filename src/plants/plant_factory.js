@@ -3,7 +3,7 @@ import {Flowering, Woody, Fungus}from "./plants.js";
 
 export class PlantFactory {
 
-    availableTypes = ["woody", "flowering", "fungus"];
+    availableTypes = ["woody", "flowering", "flowering", "fungus"];
 
     constructor(options, plantType) {
 

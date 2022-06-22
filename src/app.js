@@ -65,7 +65,7 @@ class Generator {
                 filtering_enabled: false
             };
 
-        let plantCount = this.configuration.get("plantCount") || 1;
+        let plantCount = this.configuration.get("plantCount") || 8;
         let renderObject = document.getElementById('render-object');
         for(var i = 0; i < plantCount; i++) {
             if(this.geneEditor.isEmpty) {
@@ -84,7 +84,7 @@ class Generator {
                     
             if(plantCount == 1) {
                 this.geneEditor.render(plant.dna.genes);
-                var perRow = 8;
+                var perRow = 9;
             }else{
                 var perRow = 4
             }
