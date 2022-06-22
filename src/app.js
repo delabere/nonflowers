@@ -65,7 +65,11 @@ class Generator {
                 filtering_enabled: false
             };
 
-        console.log(this.geneEditor.dna)
+        let plantCount = this.configuration.get("plantCount") || 1;
+
+        for(var i = 0; i < plantCount; i++) {
+            let plant = PlantFactory.CreatePlant(options);
+            plant.render(this.canvas);
         if(this.geneEditor.isEmpty) {
             console.log("EDITING", this.geneEditor.dna)
             options.dna = new DNA(this.geneEditor.dna);
@@ -84,6 +88,7 @@ class Generator {
 
         const name = new nameComponent({containerElementId: 'render-object'});
               name.render(plant);
+    }
 
 
     }
