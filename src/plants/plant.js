@@ -144,6 +144,9 @@ export class Plant extends Drawable {
           L.push(l)
           R.push(r)
         }
+
+
+        // VEINS
         if (vei[0] == 1){
           for (var i = 1; i < P.length; i++){
             for (var j = 0; j < vei[1]; j++){

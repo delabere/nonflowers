@@ -56,27 +56,34 @@ class Generator {
 
     _ANIMATE(timeElapsed) {
 
-        let options = {
+
+
+        let plantCount = this.configuration.get("plantCount") || 9;
+        let renderObject = document.getElementById('render-object');
+
+
+
+        for(var i = 0; i < plantCount; i++) {
+            let options = {
                 width: this.CANVAS_WIDTH,
                 height: this.CANVAS_HEIGHT, 
                 xof:this.CANVAS_WIDTH/2,
                 yof:this.CANVAS_WIDTH,
-                seed: this.configuration.get('seed'),
+                dna: {
+                    seed: this.configuration.get('seed'),
+                },
                 filtering_enabled: false
             };
 
-        let plantCount = this.configuration.get("plantCount") || 9;
-        let renderObject = document.getElementById('render-object');
-        for(var i = 0; i < plantCount; i++) {
             if(this.geneEditor.isEmpty) {
                 console.log("EDITING", this.geneEditor.dna)
                 options.dna = new DNA(this.geneEditor.dna);
                 renderObject.innerHTML = "";
             }else{
                 console.log("NEW")
-                options.dna = new DNA(options);
+                console.log('OPTION SEED:', options.dna.seed)
+                options.dna = new DNA(options.dna);
             }
-
 
             const plant = new PlantFactory(options, this.configuration.get('plantType'));
                 console.log("Generating", plant)

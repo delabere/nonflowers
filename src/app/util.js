@@ -156,9 +156,25 @@ export class Util {
         k = (k != undefined) ? k : 10
         return 1/(1+Math.exp(-k*(x-0.5)))
     }
+
+   
+    static deltoid(t,a,b) {
+        a = (a != undefined) ? a : 20;
+        b = (b != undefined) ? b : 3*a;
+        return (b-a) * Math.cos(t) + a * Math.cos(((b-a) / a) * t);
+    }
+
     // pseudo bean curve
     static bean(x){
-        return this.pow(0.25-this.pow(x-0.5,2),0.5)*(2.6+2.4*pow(x,1.5))*0.54
+        return this.pow(0.25-this.pow(x-0.5,2),0.5)*(2.6+2.4*this.pow(x,1.5))*0.54
+    }
+
+    // bicorn curve
+    // return algebraic curve known as cocked hat curve
+    static bicorn(x,y){
+
+        
+        
     }
     // interpolate between square and circle
     static squircle(r,a){

@@ -7,7 +7,7 @@ export class DNA {
     constructor(genes) {
         var PAR = {}
         if(typeof(genes) == "undefined" || genes.seed == null) {
-          this.seed = DNA.newSeed(); // This function should migrate into DNA
+          this.seed = DNA.newSeed(); 
         }else if( typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
           console.log('genes seed', genes.seed)
           this.seed = genes.seed.toString();
@@ -19,11 +19,11 @@ export class DNA {
 
         const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
  
+        PAR.capShapeMaskCoeff = 2
         PAR.flowerShapeMaskCoeff = 0.2;
         PAR.leafShapeMaskCoeff = 0.5;
         PAR.flowerShapeMask = (x) => ( Util.pow(Util.sin(Util.PI*x),this.genes.flowerShapeMaskCoeff))
         PAR.leafShapeMask = (x) => (Util.pow(Util.sin(Util.PI*x),this.genes.leafShapeMaskCoeff))
-        PAR.capShapeMask  = (x) => ( Util.sigmoid(Util.sin(Util.PI*x),this.genes.flowerShapeMaskCoeff)) 
         PAR.flowerChance = Util.randChoice([Util.normRand(0,0.08),Util.normRand(0,0.03)])
         PAR.leafChance = Util.randChoice([0, Util.normRand(0,0.1), Util.normRand(0,0.1)])
         PAR.leafType = Util.randChoice([
@@ -155,7 +155,8 @@ export class DNA {
 
 
     static newSeed() {
-      let seed = (""+(new Date()).getTime())
+      // let seed = (""+(new Date()).getTime())
+      let seed = Math.seedrandom((""+(new Date()).getTime()))
       return seed;
     }
 

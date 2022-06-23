@@ -50,12 +50,12 @@
             x="0" y="0" height="100%" width="100%">
 
                 <feTurbulence baseFrequency="0.99"
-                numOctaves="8" stitchTiles="stitch" result="colorNoise" />
+                numOctaves="8" stitchTiles="noStitch" result="colorNoise" />
                 <feDisplacementMap  in2="colorNoise" in="SourceGraphic"
                 scale="8" xChannelSelector="A" yChannelSelector="A" result="displacement"/>
 
 
-                <feComposite in="displaced" in2="SourceGraphic" result="dG" operator="atop" />
+                <feComposite in="displacement" in2="SourceGraphic" result="dG" operator="atop" />
                 <feMerge >
                     <feMergeNode in="SourceGraphic"/>
                     <feMergeNode in="dG"/>
@@ -66,7 +66,7 @@
         <filter id="aged" x="0" y="0" height="100%" width="100%" color-interpolation-filters="sRGB">
             
             <feTurbulence baseFrequency=".032"
-            numOctaves="2" stitchTiles="nostitch" seed="12" result="colorNoise" />
+            numOctaves="2" stitchTiles="noStitch" seed="12" result="colorNoise" />
 
             <feColorMatrix in="SourceGraphic" result="aged" type="matrix" 
             values="1 0 0 0 0 

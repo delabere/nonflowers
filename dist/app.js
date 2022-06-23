@@ -430,9 +430,25 @@
           k = (k != undefined) ? k : 10;
           return 1/(1+Math.exp(-k*(x-0.5)))
       }
+
+     
+      static deltoid(t,a,b) {
+          a = (a != undefined) ? a : 20;
+          b = (b != undefined) ? b : 3*a;
+          return (b-a) * Math.cos(t) + a * Math.cos(((b-a) / a) * t);
+      }
+
       // pseudo bean curve
       static bean(x){
-          return this.pow(0.25-this.pow(x-0.5,2),0.5)*(2.6+2.4*pow(x,1.5))*0.54
+          return this.pow(0.25-this.pow(x-0.5,2),0.5)*(2.6+2.4*this.pow(x,1.5))*0.54
+      }
+
+      // bicorn curve
+      // return algebraic curve known as cocked hat curve
+      static bicorn(x,y){
+
+          
+          
       }
       // interpolate between square and circle
       static squircle(r,a){
@@ -716,7 +732,7 @@
       constructor(genes) {
           var PAR = {};
           if(typeof(genes) == "undefined" || genes.seed == null) {
-            this.seed = DNA.newSeed(); // This function should migrate into DNA
+            this.seed = DNA.newSeed(); 
           }else if( typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
             console.log('genes seed', genes.seed);
             this.seed = genes.seed.toString();
@@ -728,11 +744,11 @@
 
           const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
    
+          PAR.capShapeMaskCoeff = 2;
           PAR.flowerShapeMaskCoeff = 0.2;
           PAR.leafShapeMaskCoeff = 0.5;
           PAR.flowerShapeMask = (x) => ( Util.pow(Util.sin(Util.PI*x),this.genes.flowerShapeMaskCoeff));
           PAR.leafShapeMask = (x) => (Util.pow(Util.sin(Util.PI*x),this.genes.leafShapeMaskCoeff));
-          PAR.capShapeMask  = (x) => ( Util.sigmoid(Util.sin(Util.PI*x),this.genes.flowerShapeMaskCoeff)); 
           PAR.flowerChance = Util.randChoice([Util.normRand(0,0.08),Util.normRand(0,0.03)]);
           PAR.leafChance = Util.randChoice([0, Util.normRand(0,0.1), Util.normRand(0,0.1)]);
           PAR.leafType = Util.randChoice([
@@ -863,7 +879,8 @@
 
 
       static newSeed() {
-        let seed = (""+(new Date()).getTime());
+        // let seed = (""+(new Date()).getTime())
+        let seed = Math.seedrandom((""+(new Date()).getTime()));
         return seed;
       }
 
@@ -1147,6 +1164,9 @@
             L.push(l);
             R.push(r);
           }
+
+
+          // VEINS
           if (vei[0] == 1){
             for (var i = 1; i < P.length; i++){
               for (var j = 0; j < vei[1]; j++){
@@ -1340,7 +1360,7 @@
   class Flowering extends Plant {
 
       plantNames = ["Poppy", "Dahlia", "Flower", "Petal", "Iris", "Jade", "Kale", "Tassel", "Lilac", "Magnolia", "Narcissus", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Violet", "Willow", "Lily", "Bell" ];
-      descriptiveAdjectives = ["Dwarf", "Fragrant", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
+      descriptiveAdjectives = ["Tasteless", "Dwarf", "Fragrant", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
       geoAdjectives = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "moon", "sun", "star", "swamp", "heavens", "sky", "cliff"];
       type = "flowering";
 
@@ -1643,7 +1663,6 @@
           for (var i = 0; i < Math.floor(this.genes.stemCount ); i++){
               var r = [Util.PI/2,0,Util.normRand(-1,1)*Util.PI];
               var capOffset =  Util.normRand(-40,50);
-              var gillOffset = 6;
 
               // STEM
               var P = this.stem({
@@ -1661,47 +1680,61 @@
                       ]
                   )});
               
-              var saturationWeight = Util.normRand(0.0, 0.1);
-              this.genes.innerColor.min[1] = this.clamp(this.genes.innerColor.min[1] , 0, 1);
-              this.genes.innerColor.max[1] = this.clamp(this.genes.innerColor.max[1] + saturationWeight, 0, 1);            this.genes.flowerJaggedness = Util.mapval(this.genes.flowerJaggedness, 10, 80, 40, 50);
-              var hr = Util.grot(P,-1);
-              var capShape = (x) => (Util.sigmoid(Noise.noise(x*this.genes.flowerJaggedness,this.genes.flowerShapeNoiseSeed),0.22)*this.genes.capShapeMask(x));
+   
+              // this.genes.flowerJaggedness = Util.mapval(this.genes.flowerJaggedness, 10, 80, 40, 50);
 
 
-              var sheathRotation = Util.grot(P,-1);
-              if (this.genes.sheathLength != 0){
-                this.stem({ctx:lay0,xof:x0+P[this.clamp(P.length-2,0,P.length-1)].x + capOffset,yof:y0+P[-1].y + 18,
-                    rot:sheathRotation,
-                    len:this.clamp(this.genes.sheathLength, 0, this.genes.flowerLength * 1.7),
-                    seg: 18,
-                    col: this.genes.innerColor,
-                    wid:(x) => (this.genes.sheathWidth + this.genes.stemWidth * 1.5 )*(Util.pow(Util.sin(x*Util.PI),2)-x*1.5+0.6),
-                    ben:(x) => ([0.2,0.2,0]
-                        )});
-                }
+              // var sheathRotation = Util.grot(P,-1)
+              // if (this.genes.sheathLength != 0){
+              //   this.stem({ctx:lay0,xof:x0+P[this.clamp(P.length-2,0,P.length-1)].x + capOffset,yof:y0+P[-1].y + 18,
+              //       rot:sheathRotation,
+              //       len:this.clamp(this.genes.sheathLength, 0, this.genes.flowerLength * 1.7),
+              //       seg: 18,
+              //       col: this.genes.innerColor,
+              //       wid:(x) => (this.genes.sheathWidth + this.genes.stemWidth * 1.5 )*(Util.pow(Util.sin(x*Util.PI),2)-x*1.5+0.6),
+              //       ben:(x) => ([0.2,0.2,0]
+              //           )})
+              //   }
+
+                let capRotation = v3.add(Util.grot(P,-1), [0,0,0]);
 
               //GILLS
-              this.genes.leafColor = {min: [Util.normRand(58, 62),Util.normRand(0.2,0.32),Util.normRand(0.8, 0.94),0.999],
-                  max: [Util.normRand(58, 62),Util.normRand(0.2,0.62),Util.normRand(0.1, 0.3),0.999]};
+              this.genes.leafColor = {min: [Util.normRand(58, 62),Util.normRand(0.3,0.52),Util.normRand(0.8, 0.94),0.8],
+                  max: [Util.normRand(58, 62),Util.normRand(0.2,0.62),Util.normRand(0.4, 0.6),0.2]};
+
+
+              var capVariation = Util.normRand(0.5,2.5);
+              var capShapeMask  = (x) => ( Util.deltoid(Util.sin(Math.PI*x),this.genes.capShapeMaskCoeff *capVariation , Math.PI/2)); 
+
+              var capBend = [0,0,0];//capRotation;
+
+              // this.leaf({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y + gillOffset,
+              //   rot:capRotation,
+              //   len:(this.genes.flowerLength+gillOffset*3.5),
+              //   gil: true,
+              //   col:this.genes.leafColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
+              //   // wid:(x) => Util.deltoid(x,0.02),
+              //   wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2))-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.3, 18,30) *0.9),
+              //   ben:(x) => (capBend)})
 
               
-              var capBend = [Util.normRand(0, 0.2),Util.normRand(0, 0.2),0];
-              this.cap({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y + gillOffset,
-                rot:hr,
-                len:(this.genes.flowerLength+gillOffset*3.5),
-                gil: true,
-                col:this.genes.leafColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
-                wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2))-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.3, 18,30) *0.9),
-                ben:(x) => (capBend)});
-
-
+              // Make cap shape open with stem age
+              var stemAge = (this.genes.stemLength * Util.normRand(0.002, 1.2));
+              console.log(stemAge, capShapeMask(stemAge), this.genes.flowerWidth, Math.cos(stemAge/this.genes.flowerWidth));
               // CAP
-              this.cap({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y,
-                rot:hr,
+              this.cap({ctx:lay0,
+                xof:x0+P[-1].x + capOffset,
+                yof:y0+P[-1].y,
+                rot:capRotation,
+                flo: false,
+                vei: [1,9],
                 len:this.genes.flowerLength*Util.normRand(0.2, 1.2) + 70,
-                col:this.genes.innerColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
-                wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2),0.9)-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
-                ben:(x) => (capBend)});
+                col:this.genes.flowerColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
+                wid: (x) => Util.bean(x / capShapeMask(stemAge + x)) * (Util.bean(x)/(x*0.8)) * (this.genes.flowerWidth * capShapeMask(stemAge + x)  ),
+
+                // wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2),0.9)-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
+                ben:(x) => capBend
+              });
 
 
 
@@ -1717,6 +1750,7 @@
         var yof = (args.yof != undefined) ? args.yof : 0;  
         var rot = (args.rot != undefined) ? args.rot : [Util.PI/2,0,0];
         var len = (args.len != undefined) ? args.len : 400;
+        var vei = (args.vei != undefined) ? args.vei : [1,9];
         var seg = (args.seg != undefined) ? args.seg : 40;
         var wid = (args.wid != undefined) ? args.wid : (x) => (6);
         var col = (args.col != undefined) ? args.col : 
@@ -1755,13 +1789,13 @@
    
               //Adds shading
               var mCurve = this.curveCoeff4;
-              var mx = Util.sigmoid( m * mCurve[0], mCurve[1]) * 2.2;// * mCurve[0]/Util.PI//* Util.cos(Util.PI/seg) * 0.09 * (0.7 )
+              Util.sigmoid( m * mCurve[0], mCurve[1]) * 2.2;// * mCurve[0]/Util.PI//* Util.cos(Util.PI/seg) * 0.09 * (0.7 )
     
               var pcurve = this.curveCoeff0;
               Util.sigmoid( p * pcurve[0], pcurve[1]) * Util.sin(Util.PI/1*seg); //* Util.mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
     
               var ncurve = this.curveCoeff2;
-              var nx = Util.sin( ( n) * ncurve[0], ncurve[1]); //  * Util.cos(Util.PI/px) * 0.1//* (Math.Util.PI/2) 
+              Util.sin( ( n) * ncurve[0], ncurve[1]); //  * Util.cos(Util.PI/px) * 0.1//* (Math.Util.PI/2) 
       
     
             var p0 = v3.lerp(L[i-1],R[i-1],m); //- Util.mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
@@ -1770,16 +1804,11 @@
             var p2 = v3.lerp(L[i-1],R[i-1],n);
             var p3 = v3.lerp(L[i],R[i],n);
 
-            v3.lerp(L[i-1],R[i-1],mx);
-            v3.lerp(L[i],R[i],mx);
-      
-            v3.lerp(L[i-1],R[i-1],nx);
-            v3.lerp(L[i],R[i],nx); 
 
-            var lt = Util.sin((nx/p) * Util.PI/2) * 0.5 + 0.1; 
+            var lt = Util.sin((n/p) ) * 0.5 + 0.1; 
 
             var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise(Util.cos(p/noiseScale) * Util.PI/2 * 0.5 + 0.5,m*noiseScale,n*noiseScale),0,1,0,1);
-            var s = Util.mapval(lt,0,1,col.max[1],col.min[1]);// *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
+            var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1);
             var v = Util.mapval(lt,0,1,col.min[2],col.max[2]);// *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
             Util.mapval(lt,0.8,1,col.min[3],col.max[3]);
 
@@ -1789,13 +1818,30 @@
                 xof:xof,yof:yof,fil:true, str:true,col:Util.hsv(h,s*0.8,v*0.6,0.7)}); 
             }else {
               Util.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
-                xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(this.clamp(h,0, 359),this.clamp(s*0.8, 0,1),v,1)});
-              Util.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
-                xof:xof,yof:yof,fil:true,str:false,col:Util.hsv(this.clamp(h,0, 359),this.clamp(s*0.8, 0,1),v,1)});
+                xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,0.8)});
             }
 
           }
+
         }
+        for (var i = 1; i < P.length; i++){
+          for (var j = 0; j < vei[1]; j++){
+            var p = j/vei[1];
+    
+            var p0 = v3.lerp(L[i-1],P[i-1],p);
+            var p1 = v3.lerp(L[i],P[i],p);
+    
+            var q0 = v3.lerp(R[i-1],P[i-1],p);
+            var q1 = v3.lerp(R[i],P[i],p);
+            Util.polygon({ctx:ctx,pts:[p0,p1],
+              xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))});
+            Util.polygon({ctx:ctx,pts:[q0,q1],
+              xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))});
+    
+          }
+        }
+        Util.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)});
+
         Util.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)});
         Util.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.6)});
         return P
@@ -3937,6 +3983,11 @@
             }, false);
       }
 
+      loadSchema(schemaFile) {
+        fetch(schemaFile)
+        .then(response => response.json())
+        .then(json => console.log(json));
+      }
       onChange(evt) {
         this.dispatchEvent(new CustomEvent('editor.change', {
           detail: this.dna
@@ -3969,11 +4020,6 @@
             form.appendChild(container);
 
           }else if (typeof(PAR[k]) == "object"){
-            // var groupName = document.createElement('div');
-            //     groupName.className = "row form-group";
-            //     groupName.innerHTML = k;
-
-            // container.appendChild(groupName)
 
             for (var i in PAR[k]){
         
@@ -4243,27 +4289,34 @@
 
       _ANIMATE(timeElapsed) {
 
-          let options = {
+
+
+          let plantCount = this.configuration.get("plantCount") || 9;
+          let renderObject = document.getElementById('render-object');
+
+
+
+          for(var i = 0; i < plantCount; i++) {
+              let options = {
                   width: this.CANVAS_WIDTH,
                   height: this.CANVAS_HEIGHT, 
                   xof:this.CANVAS_WIDTH/2,
                   yof:this.CANVAS_WIDTH,
-                  seed: this.configuration.get('seed'),
+                  dna: {
+                      seed: this.configuration.get('seed'),
+                  },
                   filtering_enabled: false
               };
 
-          let plantCount = this.configuration.get("plantCount") || 9;
-          let renderObject = document.getElementById('render-object');
-          for(var i = 0; i < plantCount; i++) {
               if(this.geneEditor.isEmpty) {
                   console.log("EDITING", this.geneEditor.dna);
                   options.dna = new DNA(this.geneEditor.dna);
                   renderObject.innerHTML = "";
               }else {
                   console.log("NEW");
-                  options.dna = new DNA(options);
+                  console.log('OPTION SEED:', options.dna.seed);
+                  options.dna = new DNA(options.dna);
               }
-
 
               const plant = new PlantFactory(options, this.configuration.get('plantType'));
                   console.log("Generating", plant);

@@ -30,6 +30,11 @@ export class GeneEditorComponent extends EventTarget {
           }, false);
     }
 
+    loadSchema(schemaFile) {
+      fetch(schemaFile)
+      .then(response => response.json())
+      .then(json => console.log(json));
+    }
     onChange(evt) {
       this.dispatchEvent(new CustomEvent('editor.change', {
         detail: this.dna
@@ -67,11 +72,6 @@ export class GeneEditorComponent extends EventTarget {
           form.appendChild(container);
 
         }else if (typeof(PAR[k]) == "object"){
-          // var groupName = document.createElement('div');
-          //     groupName.className = "row form-group";
-          //     groupName.innerHTML = k;
-
-          // container.appendChild(groupName)
 
           for (var i in PAR[k]){
       
