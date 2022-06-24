@@ -5,9 +5,9 @@ import { Util } from '../app/util.js';
 
 export class Woody extends Plant {
 
-    plantNames = [ "bindweed", "vine", "creeper", "wisteria", "Jade", "Tassel", "Lilac", "Magnolia", "Olive", "Quince", "Bramble", "Jasmine"];
-    descriptiveAdjectives = ["dwarf", "Fragrant", "feathered", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
-    geoAdjectives = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+    BASE_NAMES = [ "bindweed", "vine", "creeper", "wisteria", "Jade", "Tassel", "Lilac", "Magnolia", "Olive", "Quince", "Bramble", "Jasmine"];
+    MOOD_ADJECTIVES = ["dwarf", "Fragrant", "feathered", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
+    LOCATION_ADJECTIVES = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
     type = "woody";
 
     constructor(dna) {

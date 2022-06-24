@@ -37,8 +37,8 @@ export class Util {
     static polygon(args){
         args =(args != undefined) ? args : {};
         let ctx = (args.ctx != undefined) ? args.ctx : CTX;
-        let xof = (args.xof != undefined) ? args.xof : 0;  
-        let yof = (args.yof != undefined) ? args.yof : 0;  
+        let xof = (args.xof != undefined) ? Number(args.xof) : 0;  
+        let yof = (args.yof != undefined) ? Number(args.yof) : 0;  
         let pts = (args.pts != undefined) ? args.pts : [];
         let col = (args.col != undefined) ? args.col : this.rgba(54,69,79,1);
         let fil = (args.fil != undefined) ? args.fil : true;
@@ -47,7 +47,7 @@ export class Util {
     
         ctx.beginPath();
         if (pts.length > 0){
-            ctx.moveTo(pts[0][0]+xof,pts[0][1]+yof);
+            ctx.moveTo(Number(pts[0][0]+xof || 0),Number(pts[0][1]+yof));
         }
         for (let i = 1; i < pts.length; i++){
             ctx.lineTo(pts[i][0]+xof,pts[i][1]+yof);

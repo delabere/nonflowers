@@ -1,4 +1,3 @@
-import {Descriptor} from '../app/descriptor.js';
 import {Filter} from './../app/filter.js';
 import {Layer} from './../app/layer.js';
 import {DNA} from './../dna.js';
@@ -7,12 +6,14 @@ import {v3} from './../app/v3.js';
 import {Util} from '../app/util.js';
 import { Drawable } from '../drawable.js';
 import { ColorRangeDescriptor } from '../app/colorRangeDescriptor.js';
+import { NameGenerator } from '../app/nameGenerator.js';
 
 export class Plant extends Drawable {
 
-    plantNames = ["Poppy", "Dahlia", "Fern", "Flower", "Petal", "Iris", "Jade", "Kale", "Stickweed", "Tassel", "Lilac", "Magnolia", "Narcissus", "Olive", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Viovar", "Willow", "Lily" ];
-    descriptiveAdjectives = ["Fragrant", "adorable", "jealous", "beautiful", "clean", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "lazy", "mysterious", "nervous", "panicky", "thoughtless", "thorny", "thornless", "upright", "worried"];
-    geoAdjectives = ["cave", "dwarf", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+    BASE_NAMES = ["Poppy", "Dahlia", "Fern", "Flower", "Petal", "Iris", "Jade", "Kale", "Stickweed", "Tassel", "Lilac", "Magnolia", "Narcissus", "Olive", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Viovar", "Willow", "Lily"];
+    MOOD_ADJECTIVES = ["Fragrant", "adorable", "jealous", "beautiful", "clean", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "lazy", "mysterious", "nervous", "panicky", "thoughtless", "thorny", "thornless", "upright", "worried"];
+    LOCATION_ADJECTIVES = ["cave", "dwarf", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+
     type = "plant"
 
     curveCoeff0 = [Util.normRand(-0.5,0.5),Util.normRand(5,10)]
@@ -23,6 +24,7 @@ export class Plant extends Drawable {
 
     constructor(args) {
         super(args);
+
         this.args =(args != undefined) ? args : {};
         this.xof = (args.xof != undefined) ? args.xof : 0;  
         this.yof = (args.yof != undefined) ? args.yof : 0;
@@ -44,31 +46,17 @@ export class Plant extends Drawable {
     }
 
     get name() {
-        if(this.plantName !== undefined)
+        if(this.plantName !== undefined) {
             return this.plantName;
-
-        var randomName = [...this.plantNames].sort(() => 0.5 - Math.random())[0];
-        var randomAdjective = [...this.descriptiveAdjectives].sort(() => Math.floor(0.5 - Math.random()))[0];
-    
-        var randomGeoAdjective = [...this.geoAdjectives].sort(() => Math.floor(0.5 - Math.random()))[0];
-        var locator = "";
-        var descriptor = "";
-        var joiner = "";
-
-        if(Math.random() < 0.4) {
-            if(Math.random() < 0.7) {
-                descriptor = randomAdjective + " " + randomGeoAdjective;
-            }else{
-                joiner = ["from the", "of the"].sort(() => 0.5 - Math.random())[0];
-                descriptor = randomAdjective
-                locator =  randomGeoAdjective;
-            }
         }else{
-            var descriptor = randomAdjective;
+          let nameGenerator = new NameGenerator({
+            baseNames: this.BASE_NAMES,
+            moodAdjectives: this.MOOD_ADJECTIVES,
+            locationAdjectives: this.LOCATION_ADJECTIVES
+          })
+          this.plantName = nameGenerator.name()
+          return this.plantName;
         }
-        this.plantName = new Descriptor(descriptor + " " + randomName + " " + joiner + " " + locator)
-
-        return this.plantName;
     }
 
     get description() {

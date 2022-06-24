@@ -9,12 +9,10 @@ import { ColorRangeDescriptor } from './../app/colorRangeDescriptor.js';
 export class Fungus extends Plant {
 
     //create a list of mushroom names.
-    mushroomNames = []
-
-    plantNames = ["Cap", "Fingers", "Mushroom", "Fungus", "Stool", "Umbrella", "Hat", "Crown", "Stem"] 
+    BASE_NAMES = ["Cap", "Fingers", "Mushroom", "Fungus", "Stool", "Umbrella", "Hat", "Crown", "Stem"] 
     // stinky man fingers
-    descriptiveAdjectives = ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "stinky", "spongy", "inky", "toppled", "reaching", "upright"];
-    geoAdjectives = ["cave","man", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+    MOOD_ADJECTIVES = ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "stinky", "spongy", "inky", "toppled", "reaching", "upright"];
+    LOCATION_ADJECTIVES = ["cave","man", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
     type = "fungus";
 
     constructor(dna) {

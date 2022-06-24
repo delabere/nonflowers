@@ -312,8 +312,8 @@
       static polygon(args){
           args =(args != undefined) ? args : {};
           let ctx = (args.ctx != undefined) ? args.ctx : CTX;
-          let xof = (args.xof != undefined) ? args.xof : 0;  
-          let yof = (args.yof != undefined) ? args.yof : 0;  
+          let xof = (args.xof != undefined) ? Number(args.xof) : 0;  
+          let yof = (args.yof != undefined) ? Number(args.yof) : 0;  
           let pts = (args.pts != undefined) ? args.pts : [];
           let col = (args.col != undefined) ? args.col : this.rgba(54,69,79,1);
           let fil = (args.fil != undefined) ? args.fil : true;
@@ -322,7 +322,7 @@
       
           ctx.beginPath();
           if (pts.length > 0){
-              ctx.moveTo(pts[0][0]+xof,pts[0][1]+yof);
+              ctx.moveTo(Number(pts[0][0]+xof || 0),Number(pts[0][1]+yof));
           }
           for (let i = 1; i < pts.length; i++){
               ctx.lineTo(pts[i][0]+xof,pts[i][1]+yof);
@@ -495,26 +495,6 @@
               }
           }
           return plist;
-      }
-
-  }
-
-  class Descriptor {
-
-      constructor(str) {
-          this.str = str;
-      }
-
-      color(col) {
-          return Color.fromHSLA(col);
-      }
-
-      capitalize() {
-          return this.str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-      }
-
-      toString() {
-          return this.capitalize().trim();
       }
 
   }
@@ -1017,6 +997,26 @@
       }
   }
 
+  class Descriptor {
+
+      constructor(str) {
+          this.str = str;
+      }
+
+      color(col) {
+          return Color.fromHSLA(col);
+      }
+
+      capitalize() {
+          return this.str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+      }
+
+      toString() {
+          return this.capitalize().trim();
+      }
+
+  }
+
   class ColorRangeDescriptor extends Descriptor {
 
       constructor(args) {
@@ -1030,11 +1030,57 @@
 
   }
 
+  class NameGenerator {
+
+      constructor(args) {
+
+          this.baseNames = args.baseNames || [];
+          this.moodAdjectives = args.moodAdjectives || [];
+          this.locationAdjectives = args.locationAdjectives || [];
+
+      }
+
+      commonName() {
+          return this.randomPick(this.baseNames);
+      }
+
+      randomPick(arr, count = 1) {
+          return [...arr].sort(() => Math.floor(0.5 - Math.random())).slice(0, count);
+      }
+
+      name(moodCount = 1, locationCount = 1) {
+          var randomName = this.commonName();
+          var mood = this.randomPick(this.moodAdjectives, moodCount);
+          var location = this.randomPick(this.locationAdjectives, locationCount);
+
+          var locator = "";
+          var descriptor = "";
+          var joiner = "";
+
+          if(Math.random() < 0.4) {
+              if(Math.random() < 0.7) {
+                  // Example: Fallen Sky Violet
+                  descriptor = `${mood} ${location}`;
+              }else {
+                  // Example: Fallen Violet from the Sky
+                  joiner = this.randomPick(["from the", "of the"], 1);
+                  descriptor = mood.join(' ');
+                  locator =  location.join(' ');
+              }
+          }else {
+              var descriptor = mood;
+          }
+
+          return new Descriptor(`${descriptor} ${randomName} ${joiner} ${locator}`);
+      }
+  }
+
   class Plant extends Drawable {
 
-      plantNames = ["Poppy", "Dahlia", "Fern", "Flower", "Petal", "Iris", "Jade", "Kale", "Stickweed", "Tassel", "Lilac", "Magnolia", "Narcissus", "Olive", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Viovar", "Willow", "Lily" ];
-      descriptiveAdjectives = ["Fragrant", "adorable", "jealous", "beautiful", "clean", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "lazy", "mysterious", "nervous", "panicky", "thoughtless", "thorny", "thornless", "upright", "worried"];
-      geoAdjectives = ["cave", "dwarf", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+      BASE_NAMES = ["Poppy", "Dahlia", "Fern", "Flower", "Petal", "Iris", "Jade", "Kale", "Stickweed", "Tassel", "Lilac", "Magnolia", "Narcissus", "Olive", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Viovar", "Willow", "Lily"];
+      MOOD_ADJECTIVES = ["Fragrant", "adorable", "jealous", "beautiful", "clean", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "lazy", "mysterious", "nervous", "panicky", "thoughtless", "thorny", "thornless", "upright", "worried"];
+      LOCATION_ADJECTIVES = ["cave", "dwarf", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+
       type = "plant"
 
       curveCoeff0 = [Util.normRand(-0.5,0.5),Util.normRand(5,10)]
@@ -1045,6 +1091,7 @@
 
       constructor(args) {
           super(args);
+
           this.args =(args != undefined) ? args : {};
           this.xof = (args.xof != undefined) ? args.xof : 0;  
           this.yof = (args.yof != undefined) ? args.yof : 0;
@@ -1066,31 +1113,17 @@
       }
 
       get name() {
-          if(this.plantName !== undefined)
+          if(this.plantName !== undefined) {
               return this.plantName;
-
-          var randomName = [...this.plantNames].sort(() => 0.5 - Math.random())[0];
-          var randomAdjective = [...this.descriptiveAdjectives].sort(() => Math.floor(0.5 - Math.random()))[0];
-      
-          var randomGeoAdjective = [...this.geoAdjectives].sort(() => Math.floor(0.5 - Math.random()))[0];
-          var locator = "";
-          var descriptor = "";
-          var joiner = "";
-
-          if(Math.random() < 0.4) {
-              if(Math.random() < 0.7) {
-                  descriptor = randomAdjective + " " + randomGeoAdjective;
-              }else {
-                  joiner = ["from the", "of the"].sort(() => 0.5 - Math.random())[0];
-                  descriptor = randomAdjective;
-                  locator =  randomGeoAdjective;
-              }
           }else {
-              var descriptor = randomAdjective;
+            let nameGenerator = new NameGenerator({
+              baseNames: this.BASE_NAMES,
+              moodAdjectives: this.MOOD_ADJECTIVES,
+              locationAdjectives: this.LOCATION_ADJECTIVES
+            });
+            this.plantName = nameGenerator.name();
+            return this.plantName;
           }
-          this.plantName = new Descriptor(descriptor + " " + randomName + " " + joiner + " " + locator);
-
-          return this.plantName;
       }
 
       get description() {
@@ -1359,9 +1392,10 @@
 
   class Flowering extends Plant {
 
-      plantNames = ["Poppy", "Dahlia", "Flower", "Petal", "Iris", "Jade", "Kale", "Tassel", "Lilac", "Magnolia", "Narcissus", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Violet", "Willow", "Lily", "Bell" ];
-      descriptiveAdjectives = ["Tasteless", "Dwarf", "Fragrant", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
-      geoAdjectives = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "moon", "sun", "star", "swamp", "heavens", "sky", "cliff"];
+      BASE_NAMES = ["Poppy", "Dahlia", "Flower", "Petal", "Iris", "Jade", "Tassel", "Lilac", "Magnolia", "Narcissus", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Violet", "Willow", "Lily", "Bell" ];
+      MOOD_ADJECTIVES = ["Tasteless", "Dwarf", "Fragrant", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
+      LOCATION_ADJECTIVES = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "moon", "sun", "star", "swamp", "heavens", "sky", "cliff"];
+
       type = "flowering";
 
       constructor(options) {
@@ -1513,9 +1547,9 @@
 
   class Woody extends Plant {
 
-      plantNames = [ "bindweed", "vine", "creeper", "wisteria", "Jade", "Tassel", "Lilac", "Magnolia", "Olive", "Quince", "Bramble", "Jasmine"];
-      descriptiveAdjectives = ["dwarf", "Fragrant", "feathered", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
-      geoAdjectives = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+      BASE_NAMES = [ "bindweed", "vine", "creeper", "wisteria", "Jade", "Tassel", "Lilac", "Magnolia", "Olive", "Quince", "Bramble", "Jasmine"];
+      MOOD_ADJECTIVES = ["dwarf", "Fragrant", "feathered", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
+      LOCATION_ADJECTIVES = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
       type = "woody";
 
       constructor(dna) {
@@ -1623,12 +1657,10 @@
   class Fungus extends Plant {
 
       //create a list of mushroom names.
-      mushroomNames = []
-
-      plantNames = ["Cap", "Fingers", "Mushroom", "Fungus", "Stool", "Umbrella", "Hat", "Crown", "Stem"] 
+      BASE_NAMES = ["Cap", "Fingers", "Mushroom", "Fungus", "Stool", "Umbrella", "Hat", "Crown", "Stem"] 
       // stinky man fingers
-      descriptiveAdjectives = ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "stinky", "spongy", "inky", "toppled", "reaching", "upright"];
-      geoAdjectives = ["cave","man", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+      MOOD_ADJECTIVES = ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "stinky", "spongy", "inky", "toppled", "reaching", "upright"];
+      LOCATION_ADJECTIVES = ["cave","man", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
       type = "fungus";
 
       constructor(dna) {
