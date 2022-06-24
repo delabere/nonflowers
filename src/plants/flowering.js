@@ -35,8 +35,7 @@ export class Flowering extends Plant {
         let x0 = this.width*0.5;
         let y0 = this.height*0.8; 
 
-        // let saturation = (x, bump) => x[1] + bump;
-        var saturation = (x, bump) => {x[1] = this.clamp(x[1] + bump, 0,1); return x};
+        let saturation = (x, bump) => {x[1] = this.clamp(x[1] + bump, 0,1); return x};
          
         for (var i = 0; i < this.genes.stemCount; i++){
 

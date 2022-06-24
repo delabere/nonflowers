@@ -39,7 +39,8 @@ export class Fungus extends Plant {
         
         var x0 = cwid*0.5;
         var y0 = cheight*0.9; 
-
+        let saturation = (x, bump) => {x[1] = this.clamp(x[1] + bump, 0,1); return x};
+        this.genes.flowerColor = Object.keys(this.genes.flowerColor).reduce((result, k) => {  result[k] = saturation(this.genes.flowerColor[k], 0.05); return result}, {}) ,
         // ideal stem color
         this.genes.branchColor = {min: [Util.normRand(50.63842005726726, 56),Util.normRand(0.2,0.32),Util.normRand(0.26011155920859, 0.34),0.999],
           max: [Util.normRand(58.63842005726724, 62),Util.normRand(0.4, 0.7),Util.normRand(0.86011155920859, 0.99),0.999]}
@@ -107,7 +108,7 @@ export class Fungus extends Plant {
             
             // Make cap shape open with stem age
             var stemAge = (this.genes.stemLength * Util.normRand(0.002, 1.2))
-            console.log(stemAge, capShapeMask(stemAge), this.genes.flowerWidth, Math.cos(stemAge/this.genes.flowerWidth))
+            // console.log(stemAge, capShapeMask(stemAge), this.genes.flowerWidth, Math.cos(stemAge/this.genes.flowerWidth))
             // CAP
             this.cap({ctx:lay0,
               xof:x0+P[-1].x + capOffset,
@@ -116,7 +117,7 @@ export class Fungus extends Plant {
               flo: false,
               vei: [1,9],
               len:this.genes.flowerLength*Util.normRand(0.2, 1.2) + 70,
-              col:this.genes.flowerColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
+              col: this.genes.flowerColor,
               wid: (x) => Util.bean(x / capShapeMask(stemAge + x)) * (Util.bean(x)/(x*0.8)) * (this.genes.flowerWidth * capShapeMask(stemAge + x)  ),
 
               // wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2),0.9)-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
