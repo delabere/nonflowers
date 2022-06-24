@@ -24,7 +24,10 @@ export class Woody extends Plant {
         this.layers.push(lay0,lay1)
         var x0 = cwid*0.5
         var y0 = cheight*0.99
-             
+
+        let saturation = (x, bump) => { x[1] = this.clamp(x[1] + bump, 0,1); return x};
+        let flowerColorCopy = Util.deepClone(this.genes.flowerColor); 
+
         var PL = this.branch({
           ctx:lay0,xof:x0,yof:y0,
           wid:this.genes.branchWidth,
@@ -79,7 +82,7 @@ export class Woody extends Plant {
                     len:this.genes.flowerLength *Util.normRand(0.7,1.3),
                     wid:(x) => ( this.genes.flowerShape(x)*this.genes.flowerWidth ),
                     vei:[0],
-                    col:this.genes.flowerColor,
+                    col: Object.keys(flowerColorCopy).reduce((result, k) => {  result[k] = saturation(flowerColorCopy[k], (0.003 / (i / this.genes.stemCount))); return result}, {}) ,
                     cof:this.genes.flowerColorCurve,
                     ben:(x) => ([
                       this.genes.flowerOpenCurve(x,op),

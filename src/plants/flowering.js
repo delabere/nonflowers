@@ -115,7 +115,7 @@ export class Flowering extends Plant {
                         len:this.genes.flowerLength *Util.normRand(0.7,1.3)*1.5,
                         wid:(x) => ( 1.5*this.genes.flowerShape(x)*this.genes.flowerWidth ),
                         vei:[0],
-                        col: Object.keys(flowerColorCopy).reduce((result, k) => {  result[k] = saturation(flowerColorCopy[k], (0.02 / this.genes.stemCount)); return result}, {}) ,
+                        col: Object.keys(flowerColorCopy).reduce((result, k) => {  result[k] = saturation(flowerColorCopy[k], (0.019 / this.genes.stemCount)); return result}, {}) ,
                         cof:this.genes.flowerColorCurve,
                         ben:(x) => ([
                             this.genes.flowerOpenCurve(x,op),
