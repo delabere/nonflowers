@@ -34,7 +34,10 @@ export class Flowering extends Plant {
         // start drawing at
         let x0 = this.width*0.5;
         let y0 = this.height*0.8; 
-            
+
+        // let saturation = (x, bump) => x[1] + bump;
+        var saturation = (x, bump) => {x[1] = this.clamp(x[1] + bump, 0,1); return x};
+         
         for (var i = 0; i < this.genes.stemCount; i++){
 
             let r = [Util.PI/2,0,Util.normRand(-1,1)*Util.PI]
@@ -112,7 +115,7 @@ export class Flowering extends Plant {
                         len:this.genes.flowerLength *Util.normRand(0.7,1.3)*1.5,
                         wid:(x) => ( 1.5*this.genes.flowerShape(x)*this.genes.flowerWidth ),
                         vei:[0],
-                        col:this.genes.flowerColor,
+                        col: Object.keys(this.genes.flowerColor).reduce((result, k) => {  result[k] = saturation(this.genes.flowerColor[k], 0.01); return result}, {}) ,
                         cof:this.genes.flowerColorCurve,
                         ben:(x) => ([
                             this.genes.flowerOpenCurve(x,op),
