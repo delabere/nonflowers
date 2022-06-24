@@ -223,4 +223,8 @@ export class Util {
         return plist;
     }
 
+    static deepClone(array){
+        return JSON.parse(JSON.stringify(array));
+    }
+
 }
