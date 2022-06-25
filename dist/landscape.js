@@ -299,9 +299,15 @@
       }
 
       static hsv(h, s, v, a) {
+          h = (h != undefined ) ? this.clamp(h, 0, 360):359;
+          s = (s != undefined) ? this.clamp(s, 0, 1.0):1;
+          v = (v != undefined) ? this.clamp(v, 0, 1.0):1;
+          a = (a != undefined) ? this.clamp(a, 0, 1.0):1.0;
           let c = v*s;
-          let x = c*(1-this.abs((h/60)%2-1));
+          let x = c*(1-Math.abs((h/60)%2-1));
           let m = v-c;
+          
+          console.log(h,s,v,a, c, x, m);
           let [rv,gv,bv] = ([[c,x,0],[x,c,0],[0,c,x],
                               [0,x,c],[x,0,c],[c,0,x]])[Math.floor(h/60)];
           let [r,g,b] = [(rv+m)*255,(gv+m)*255,(bv+m)*255,a];
@@ -330,32 +336,7 @@
           return v3.toeuler(d)
       }
 
-      static tubify(args){
-          args = (args != undefined) ? args : {};
-          let pts = (args.pts != undefined) ? args.pts : [];
-          let wid = (args.wid != undefined) ? args.wid : (x)=>(10);
-          let vtxlist0 = [];
-          let vtxlist1 = [];
-          for (let i = 1; i < pts.length-1; i++){
-              let w = wid(i/pts.length);
-              let a1 = Math.atan2(pts[i][1]-pts[i-1][1],pts[i][0]-pts[i-1][0]);
-              let a2 = Math.atan2(pts[i][1]-pts[i+1][1],pts[i][0]-pts[i+1][0]);
-              let a = (a1+a2)/2;
-              if (a < a2){a+=Math.PI;}
-              vtxlist0.push([pts[i][0]+w*this.cos(a),(pts[i][1]+w*this.sin(a))]);
-              vtxlist1.push([pts[i][0]-w*this.cos(a),(pts[i][1]-w*this.sin(a))]);
-          }
-          let l = pts.length-1;
-          let a0 = Math.atan2(pts[1][1]-pts[0][1],pts[1][0]-pts[0][0]) - Math.PI/2;
-          let a1 = Math.atan2(pts[l][1]-pts[l-1][1],pts[l][0]-pts[l-1][0]) - Math.PI/2;
-          let w0 = wid(0);
-          let w1 = wid(1);
-          vtxlist0.unshift([pts[0][0]+w0*Math.cos(a0),(pts[0][1]+w0*Math.sin(a0))]);
-          vtxlist1.unshift([pts[0][0]-w0*Math.cos(a0),(pts[0][1]-w0*Math.sin(a0))]);
-          vtxlist0.push([pts[l][0]+w1*Math.cos(a1),(pts[l][1]+w1*Math.sin(a1))]);
-          vtxlist1.push([pts[l][0]-w1*Math.cos(a1),(pts[l][1]-w1*Math.sin(a1))]);
-          return [vtxlist0,vtxlist1]
-      }
+
 
 
 
@@ -952,7 +933,7 @@
           let xof = (args.xof != undefined) ? Number(args.xof) : 0;  
           let yof = (args.yof != undefined) ? Number(args.yof) : 0;  
           let pts = (args.pts != undefined) ? args.pts : [];
-          let col = (args.col != undefined) ? args.col : this.rgba(54,69,79,1);
+          let col = (args.col != undefined) ? args.col : Util.rgba(54,69,79,1);
           let fil = (args.fil != undefined) ? args.fil : true;
           let str = (args.str != undefined) ? args.str : !fil;
           let lineWidth = (args.lineWidth != undefined) ? args.lineWidth : 0.2;
@@ -971,7 +952,7 @@
           if (str){
               ctx.lineWidth = lineWidth;
               ctx.lineJoin = "round";
-              ctx.strokeStyle = col;
+              ctx.strokeStyle =  col;
               ctx.stroke();
           }
       }
@@ -1897,10 +1878,10 @@
             var p3 = v3.lerp(L[i],R[i],n);
 
 
-            var lt = Util.sin((n/p) ) * 0.5 + 0.1; 
+            var lt = n/p;// * 0.5 + 0.1 
 
-            var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise(Util.cos(p/noiseScale) * Util.PI/2 * 0.5 + 0.5,m*noiseScale,n*noiseScale),0,1,0,1);
-            var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1);
+            var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise((p*noiseScale) ,m*noiseScale,n*noiseScale),0,1,0.5,1);
+            var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1);
             var v = Util.mapval(lt,0,1,col.min[2],col.max[2]);// *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
             Util.mapval(lt,0.8,1,col.min[3],col.max[3]);
 

@@ -195,10 +195,10 @@ export class Fungus extends Plant {
           var p3 = v3.lerp(L[i],R[i],n)
 
 
-          var lt = Util.sin((n/p) ) * 0.5 + 0.1 
+          var lt = n/p// * 0.5 + 0.1 
 
-          var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise(Util.cos(p/noiseScale) * Util.PI/2 * 0.5 + 0.5,m*noiseScale,n*noiseScale),0,1,0,1)
-          var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
+          var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise((p*noiseScale) ,m*noiseScale,n*noiseScale),0,1,0.5,1)
+          var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
           var v = Util.mapval(lt,0,1,col.min[2],col.max[2])// *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
           var a = Util.mapval(lt,0.8,1,col.min[3],col.max[3])
 

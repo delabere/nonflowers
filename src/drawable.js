@@ -83,7 +83,7 @@ export class Drawable {
         let xof = (args.xof != undefined) ? Number(args.xof) : 0;  
         let yof = (args.yof != undefined) ? Number(args.yof) : 0;  
         let pts = (args.pts != undefined) ? args.pts : [];
-        let col = (args.col != undefined) ? args.col : this.rgba(54,69,79,1);
+        let col = (args.col != undefined) ? args.col : Util.rgba(54,69,79,1);
         let fil = (args.fil != undefined) ? args.fil : true;
         let str = (args.str != undefined) ? args.str : !fil;
         let lineWidth = (args.lineWidth != undefined) ? args.lineWidth : 0.2;
@@ -102,7 +102,7 @@ export class Drawable {
         if (str){
             ctx.lineWidth = lineWidth;
             ctx.lineJoin = "round";
-            ctx.strokeStyle = col;
+            ctx.strokeStyle =  col;
             ctx.stroke();
         }
     }
