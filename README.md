@@ -16,6 +16,7 @@ I wanted to have a botanical catalog of plants that could be tied to a procedura
 
 ### Fungi
 
+![Screen Shot 2022-06-25 at 12 15 19](https://user-images.githubusercontent.com/4501/175782010-667ff159-fde2-463f-adde-233cb473dcde.png)
 
 
 
@@ -24,6 +25,13 @@ I wanted to have a botanical catalog of plants that could be tied to a procedura
 ## Plant Types
 
 Woody, Flowering, Leafy, Sprigs, Fungi
+
+## Landscapes
+
+[Open app](https://esmarkowski.github.io/nonflowers/landscape?plantType=flowers)
+
+![landscape](https://user-images.githubusercontent.com/4501/175781769-aabe64c8-b6b3-4f3d-9b4d-99ee8e11dcb6.png)
+
 
 ## Transitions
 
