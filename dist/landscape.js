@@ -1970,50 +1970,6 @@
 
   }
 
-  class nameComponent {
-      constructor(args) {
-          this.containerElementId = (typeof(args.containerElementId) !== "undefined" && args.containerElementId !== null) ? args.containerElementId : "flora";
-      }
-
-
-      render(plant, className = 'col-md-8') {
-
-          var flowerContainer = document.createElement('div');
-              flowerContainer.className = className + " flower mb-4";
-              flowerContainer.id = plant.seed;
-
-          var plantImg = document.createElement('img');
-              plantImg.src = plant.canvas.toDataURL('image/png');
-              plantImg.className = "img-fluid";
-
-          flowerContainer.appendChild(plantImg);
-
-          var infoContainer = document.createElement('div');
-              infoContainer.className = "col-md-8 col-sm-6 mx-auto";
-
-          var h5 = document.createElement("a");
-              h5.className = "";
-              h5.innerHTML = plant.name;
-              h5.href= "./?seed=" + plant.seed + "&plantType=" + plant.type + "&plantCount=1";
-              h5.target = "_blank";
-
-          infoContainer.appendChild(h5);
-
-          Object.entries(plant.description).map(obj => {
-              var description = document.createElement("p");
-              description.className = "text-start my-0 ms-2";
-              description.innerHTML = obj.reverse().join(" ");// [1] + obj[0];
-              infoContainer.appendChild(description);
-          });
-
-          flowerContainer.appendChild(infoContainer);
-
-          var flora = document.getElementById(this.containerElementId);
-              flora.appendChild(flowerContainer);
-      }
-
-  }
-
   /*
   Copyright 2019 David Bau.
 
@@ -4383,7 +4339,17 @@
           let renderObject = document.getElementById('render-object');
 
 
+          let landscapeHeight = window.innerHeight;
+          let landscapeWidth = window.innerWidth;
+          var landscapeCenter = landscapeWidth/2;
+          let landscape = new Layer(landscapeWidth, landscapeHeight);
 
+          landscape.globalCompositeOperation = 'destination-xor';
+          landscape.imageSmoothingQuality = "high";
+
+
+
+          console.log('in',window.innerHeight);
           for(var i = 0; i < plantCount; i++) {
               let options = {
                   width: this.CANVAS_WIDTH,
@@ -4396,33 +4362,45 @@
                   filtering_enabled: false
               };
 
-              if(this.geneEditor.isEmpty) {
-                  console.log("EDITING", this.geneEditor.dna);
-                  options.dna = new DNA(this.geneEditor.dna);
-                  renderObject.innerHTML = "";
-              }else {
-                  console.log("NEW");
-                  console.log('OPTION SEED:', options.dna.seed);
-                  options.dna = new DNA(options.dna);
-              }
+
+              console.log('OPTION SEED:', options.dna.seed);
+              options.dna = new DNA(options.dna);
 
               const plant = new PlantFactory(options, this.configuration.get('plantType'));
                   console.log("Generating", plant);
                   plant.generate({containerElementId: 'canvas-container'});
                       
-              if(plantCount == 1) {
-                  this.geneEditor.render(plant.dna.genes);
-                  var perRow = 9;
-              }else {
-                  var perRow = 4;
+                  // plant.ctx.scale(0.2, 0.2);
+              var scale = 400;
+              var scaledToLandscape = scale * (plant.height / plant.width);
+              let distribution = 12;
+              for(var k=0; k<distribution; k++) {
+
+                  var jitterX = Math.cos(Util.QuadInOut(Math.sin(Math.random() * 0.2 )) * (plant.width*0.5) + (plant.width*0.5));
+                  var distributionX = ((landscapeCenter - Math.sin(Util.QuadInOut((k+1))) * (landscapeWidth)) - plant.width/2)/2 + landscapeCenter/2;
+                  var distributionY = (landscapeHeight/2 - Math.cos(Util.QuadInOut((k))) * (120) - plant.height/2)/2 - landscapeHeight/2;
+
+                  landscape.drawImage(plant.canvas,
+                      distributionX + (Util.normRand(-80, 80) * jitterX),
+                      //gaussianRandom(0, landscapeWidth),
+                     // (Util.clamp((landscapeWidth / Math.sin(k+1)) - plant.width/2, plant.width/2, landscapeWidth - plant.width))  - ((k * Math.random()) * plant.width/2)) + plant.width/2, 
+                  //    ((distributionX / distributionY) *
+                      Math.abs(distributionY) + (Util.normRand(0, 30) * jitterX),// - (landscapeHeight - plant.height/2), //- (landscapeHeight - plant.height/2) , 
+                      // distributionY + distributionX,
+                      scale, 
+                      scaledToLandscape 
+                  );
               }
 
 
-              // This contains the entire plant image and name
-              const name = new nameComponent({containerElementId: 'render-object'});
-                    name.render(plant, "col-md-" + perRow);
+
           }
 
+          var plantImg = document.createElement('img');
+          plantImg.src = landscape.canvas.toDataURL('image/png');
+          plantImg.className = "img-fluid";
+          plantImg.style = "filter: url(#smudge) url(#aged);";
+          renderObject.appendChild(plantImg);
 
       }
 
@@ -4437,4 +4415,4 @@
   }
 
 })();
-//# sourceMappingURL=app.js.map
+//# sourceMappingURL=landscape.js.map

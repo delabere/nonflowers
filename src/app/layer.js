@@ -22,8 +22,6 @@ export class Layer {
 
       ctx0.globalCompositeOperation = ble;
 
-
-
       ctx0.drawImage(ctx1.canvas,xof,yof)
     }
 
@@ -132,11 +130,14 @@ export class Layer {
         context.scale(ratio, ratio);
     }
 
+    
+
     static createCanvas(w,h) {
         let canvas = document.createElement('canvas');
 
         canvas.width = w;
         canvas.height = h; 
+        
         var context = canvas.getContext('2d');
 
         // this.scaleCanvas(canvas, context, w, h)

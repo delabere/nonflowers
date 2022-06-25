@@ -34,34 +34,10 @@ export class Util {
 
     }
 
-    static polygon(args){
-        args =(args != undefined) ? args : {};
-        let ctx = (args.ctx != undefined) ? args.ctx : CTX;
-        let xof = (args.xof != undefined) ? Number(args.xof) : 0;  
-        let yof = (args.yof != undefined) ? Number(args.yof) : 0;  
-        let pts = (args.pts != undefined) ? args.pts : [];
-        let col = (args.col != undefined) ? args.col : this.rgba(54,69,79,1);
-        let fil = (args.fil != undefined) ? args.fil : true;
-        let str = (args.str != undefined) ? args.str : !fil;
-        let lineWidth = (args.lineWidth != undefined) ? args.lineWidth : 0.2;
-    
-        ctx.beginPath();
-        if (pts.length > 0){
-            ctx.moveTo(Number(pts[0][0]+xof || 0),Number(pts[0][1]+yof));
-        }
-        for (let i = 1; i < pts.length; i++){
-            ctx.lineTo(pts[i][0]+xof,pts[i][1]+yof);
-        }
-        if (fil){
-            ctx.fillStyle = col;
-            ctx.fill();
-        }
-        if (str){
-            ctx.lineWidth = lineWidth;
-            ctx.lineJoin = "round";
-            ctx.strokeStyle = col;
-            ctx.stroke();
-        }
+   
+
+    static clamp(num, min, max) {
+        return Math.min(Math.max(num, min), max);
     }
 
     static lerpHue(h0,h1,p){
@@ -107,23 +83,7 @@ export class Util {
         return [vtxlist0,vtxlist1]
     }
 
-    static stroke(args){
-        let noiseScale = 10; // 10
-        args = (args != undefined) ? args : {};
-        let pts = (args.pts != undefined) ? args.pts : [];
-        let ctx = (args.ctx != undefined) ? args.ctx : CTX;
-        let xof = (args.xof != undefined) ? args.xof : 0;
-        let yof = (args.yof != undefined) ? args.yof : 0;
-        let col = (args.col != undefined) ? args.col : "black";
-        let wid = (args.wid != undefined) ? args.wid :
-            (x)=>(1*this.sin(x*this.PI)*this.mapval(Noise.noise(x*noiseScale),0,1,0.5,1));
-    
-        let [vtxlist0,vtxlist1] = this.tubify({pts:pts,wid:wid})
-    
-        this.polygon({pts:vtxlist0.concat(vtxlist1.reverse()),
-            ctx:ctx,fil:true,col:col,xof:xof,yof:yof})
-        return [vtxlist0,vtxlist1]
-    }
+
 
     static distance(p0,p1){
         return Math.sqrt(Math.pow(p0[0]-p1[0],2) + Math.pow(p0[1]-p1[1],2));
@@ -222,6 +182,19 @@ export class Util {
         }
         return plist;
     }
+
+
+    static QuadInOut(k) {
+        if ((k *= 2) < 1) {
+            return 0.5 * k * k;
+        }
+        return - 0.5 * (--k * (k - 2) - 1);
+
+    }
+    static QuadOut(k) {
+        return k * k;
+    }
+
 
     static deepClone(array){
         return JSON.parse(JSON.stringify(array));

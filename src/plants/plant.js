@@ -122,9 +122,9 @@ export class Plant extends Drawable {
             var v = Util.mapval(lt,0,1,col.min[2],col.max[2])
             var a = Util.mapval(lt,0,1,col.min[3],col.max[3])
       
-            Util.polygon({ctx:ctx,pts:[l,L[-1],P[-1],disp],
+            this.polygon({ctx:ctx,pts:[l,L[-1],P[-1],disp],
               xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,a)})
-            Util.polygon({ctx:ctx,pts:[r,R[-1],P[-1],disp],
+            this.polygon({ctx:ctx,pts:[r,R[-1],P[-1],disp],
               xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,a)})
           }
           P.push(disp);
@@ -145,26 +145,26 @@ export class Plant extends Drawable {
       
               var q0 = v3.lerp(R[i-1],P[i-1],p)
               var q1 = v3.lerp(R[i],P[i],p)
-              Util.polygon({ctx:ctx,pts:[p0,p1],
+              this.polygon({ctx:ctx,pts:[p0,p1],
                 xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))})
-              Util.polygon({ctx:ctx,pts:[q0,q1],
+              this.polygon({ctx:ctx,pts:[q0,q1],
                 xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))})
       
             }
           }
-          Util.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)})
+          this.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)})
         }else if (vei[0] == 2){
           for (var i = 1; i < P.length-vei[1]; i+=vei[2]){
-            Util.polygon({ctx:ctx,pts:[P[i],L[i+vei[1]]],
+            this.polygon({ctx:ctx,pts:[P[i],L[i+vei[1]]],
               xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))})
-            Util.polygon({ctx:ctx,pts:[P[i],R[i+vei[1]]],
+            this.polygon({ctx:ctx,pts:[P[i],R[i+vei[1]]],
               xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))})
           }
-          Util.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)})
+          this.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)})
         }
       
-        Util.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(120,100,0,0.3)})
-        Util.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(120,100,0,0.3)})
+        this.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(120,100,0,0.3)})
+        this.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(120,100,0,0.3)})
         return P
     }
 
@@ -286,7 +286,7 @@ export class Plant extends Drawable {
       ROT.push(crot);
       P.push(disp);
     }
-    var [L,R] = Util.tubify({pts:P,wid:wid})
+    var [L,R] = this.tubify({pts:P,wid:wid})
     var wseg = 8;
     var noiseScale = 10;
     for (var i = 1; i < P.length; i++){
@@ -315,14 +315,14 @@ export class Plant extends Drawable {
         var v = Util.mapval(lt,0,1,col.min[2],col.max[2])*Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
         var a = Util.mapval(lt,0,1,col.min[3],col.max[3])
   
-        Util.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+        this.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
           xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,a)
         })
   
       }
     }
-    Util.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)})
-    Util.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)})
+    this.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)})
+    this.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)})
     return P
   }
 }

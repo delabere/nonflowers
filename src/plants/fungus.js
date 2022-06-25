@@ -164,7 +164,7 @@ export class Fungus extends Plant {
         ROT.push(crot);
         P.push(disp);
       }
-      var [L,R] = Util.tubify({pts:P,wid:wid})
+      var [L,R] = this.tubify({pts:P,wid:wid})
       var wseg = 18 + Math.floor(seg/2) // Math.abs(this.dna.genes.flowerWidth/Util.normRand(2,3)).toFixed(0);
       var noiseScale = this.dna.genes.noiseScale ; 
       for (var i = 1; i < P.length; i++){
@@ -204,10 +204,10 @@ export class Fungus extends Plant {
 
           // console.log(col.min[0], col.max[0], h, lt, this.dna.color([h,s,v,a]).humanName)
           if(gil){
-            Util.polygon({ctx:ctx,pts:[p0,p0,p2,p3],
+            this.polygon({ctx:ctx,pts:[p0,p0,p2,p3],
               xof:xof,yof:yof,fil:true, str:true,col:Util.hsv(h,s*0.8,v*0.6,0.7)}) 
           }else{
-            Util.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+            this.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
               xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,0.8)})
           }
 
@@ -223,22 +223,18 @@ export class Fungus extends Plant {
   
           var q0 = v3.lerp(R[i-1],P[i-1],p)
           var q1 = v3.lerp(R[i],P[i],p)
-          Util.polygon({ctx:ctx,pts:[p0,p1],
+          this.polygon({ctx:ctx,pts:[p0,p1],
             xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))})
-          Util.polygon({ctx:ctx,pts:[q0,q1],
+          this.polygon({ctx:ctx,pts:[q0,q1],
             xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))})
   
         }
       }
-      Util.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)})
+      this.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)})
 
-      Util.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)})
-      Util.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.6)})
+      this.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)})
+      this.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.6)})
       return P
     }
-      
-      
-
-    
 
 }
