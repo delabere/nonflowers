@@ -1,4 +1,5 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import serve from 'rollup-plugin-serve'
 
 export default [
   {
@@ -11,7 +12,14 @@ export default [
         sourcemap: true
       }
     ],
-    plugins: [nodeResolve()]
+    plugins: [
+      nodeResolve(),
+      serve({
+        open: true,
+        contentBase: ''
+      })
+
+    ]
   },
   {
     input: ["src/landscape.js"],
@@ -24,4 +32,6 @@ export default [
     ],
     plugins: [nodeResolve()]
   }
+
+
 ];

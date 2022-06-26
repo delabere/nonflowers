@@ -32,7 +32,6 @@ export class Util {
         let x = c*(1-Math.abs((h/60)%2-1))
         let m = v-c
         
-        console.log(h,s,v,a, c, x, m)
         let [rv,gv,bv] = ([[c,x,0],[x,c,0],[0,c,x],
                             [0,x,c],[x,0,c],[c,0,x]])[Math.floor(h/60)]
         let [r,g,b] = [(rv+m)*255,(gv+m)*255,(bv+m)*255,a]

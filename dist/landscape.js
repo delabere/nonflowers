@@ -307,7 +307,6 @@
           let x = c*(1-Math.abs((h/60)%2-1));
           let m = v-c;
           
-          console.log(h,s,v,a, c, x, m);
           let [rv,gv,bv] = ([[c,x,0],[x,c,0],[0,c,x],
                               [0,x,c],[x,0,c],[c,0,x]])[Math.floor(h/60)];
           let [r,g,b] = [(rv+m)*255,(gv+m)*255,(bv+m)*255,a];
@@ -1732,15 +1731,18 @@
           // ideal stem color
           this.genes.branchColor = {min: [Util.normRand(50.63842005726726, 56),Util.normRand(0.2,0.32),Util.normRand(0.26011155920859, 0.34),0.999],
             max: [Util.normRand(58.63842005726724, 62),Util.normRand(0.4, 0.7),Util.normRand(0.86011155920859, 0.99),0.999]};
+          
+          let vei = [Util.randChoice([0,1]),Util.normRand(0,12)];
     
           for (var i = 0; i < Math.floor(this.genes.stemCount ); i++){
               var r = [Util.PI/2,0,Util.normRand(-1,1)*Util.PI];
-              var capOffset =  Util.normRand(-40,50);
+              var capOffset =  Util.normRand(-90,10);
 
               // STEM
+              var stemLength = this.genes.stemLength * Util.normRand(0.002, 1) + 4;
               var P = this.stem({
                   ctx:lay0,xof:x0 + capOffset,yof:y0,
-                  len:this.genes.stemLength * Util.normRand(0.002, 1.2) + 40,
+                  len:stemLength,
                   rot:r,
                   seg: 30,
                   col: this.genes.branchColor,
@@ -1754,22 +1756,30 @@
                   )});
               
    
+              let capRotation = v3.add(Util.grot(P,-1), [0,0,0]);
               // this.genes.flowerJaggedness = Util.mapval(this.genes.flowerJaggedness, 10, 80, 40, 50);
+              // Make cap shape open with stem age
+              var stemAge = (stemLength / this.genes.stemLength);
+              this.genes.sheathLength = (this.genes.sheathLength <= 0) ? this.genes.flowerLength + 180 : this.genes.sheathLength;//* stemAge
+              this.genes.sheathLength == 0 ? 1 : (this.genes.sheathWidth / this.genes.sheathLength); 
+              var sheathRotation = Util.grot(P,-2);
+              var desiredSheathLength = this.genes.sheathLength * (stemAge + 1.2);
+              var sheathLength = this.clamp(desiredSheathLength * (0.1 + (1 - stemAge)), 0, desiredSheathLength/6);
+              if (this.genes.sheathLength > 0){
+                  console.log("DSL", desiredSheathLength, "SCLAMP", P[-1].y - P[-2].y);
+                  this.stem({ctx:lay0,
+                      xof:x0+P[-1].x + capOffset + (-1* sheathRotation.x), 
+                      yof:y0+P[-1].y + 10 ,
+                      rot: sheathRotation,
+                      len:sheathLength,//this.clamp(desiredSheathLength, 0, P[-1].y + P[-2].y ),//this.clamp( desiredSheathLength, (this.genes.sheathLength * stemAge) , (this.genes.flowerLength + this.genes.sheathLength) * ( stemAge + 0.5)  ),
+                      seg: 18,
+                      col: this.genes.innerColor,
+                      wid:(x) => (this.genes.stemWidth )*(Util.pow(Util.sin(x*Util.PI),1)-x*0.5+0.6),
+                      // wid: (x) => Util.bean(x * (this.genes.sheathWidth + this.genes.stemWidth * stemAge)) + (this.genes.stemWidth * 1) +  this.genes.stemWidth*(Util.pow(Util.sin(x*Util.PI),2)-x*0.5+0.5),
+                      ben:(x) => [0,0,0] 
+                  });
+                }
 
-
-              // var sheathRotation = Util.grot(P,-1)
-              // if (this.genes.sheathLength != 0){
-              //   this.stem({ctx:lay0,xof:x0+P[this.clamp(P.length-2,0,P.length-1)].x + capOffset,yof:y0+P[-1].y + 18,
-              //       rot:sheathRotation,
-              //       len:this.clamp(this.genes.sheathLength, 0, this.genes.flowerLength * 1.7),
-              //       seg: 18,
-              //       col: this.genes.innerColor,
-              //       wid:(x) => (this.genes.sheathWidth + this.genes.stemWidth * 1.5 )*(Util.pow(Util.sin(x*Util.PI),2)-x*1.5+0.6),
-              //       ben:(x) => ([0.2,0.2,0]
-              //           )})
-              //   }
-
-                let capRotation = v3.add(Util.grot(P,-1), [0,0,0]);
 
               //GILLS
               this.genes.leafColor = {min: [Util.normRand(58, 62),Util.normRand(0.3,0.52),Util.normRand(0.8, 0.94),0.8],
@@ -1790,24 +1800,28 @@
               //   wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2))-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.3, 18,30) *0.9),
               //   ben:(x) => (capBend)})
 
-              
-              // Make cap shape open with stem age
-              var stemAge = (this.genes.stemLength * Util.normRand(0.002, 1.2));
-              // console.log(stemAge, capShapeMask(stemAge), this.genes.flowerWidth, Math.cos(stemAge/this.genes.flowerWidth))
-              // CAP
-              this.cap({ctx:lay0,
-                xof:x0+P[-1].x + capOffset,
-                yof:y0+P[-1].y,
-                rot:capRotation,
-                flo: false,
-                vei: [1,9],
-                len:this.genes.flowerLength*Util.normRand(0.2, 1.2) + 70,
-                col: this.genes.flowerColor,
-                wid: (x) => Util.bean(x / capShapeMask(stemAge + x)) * (Util.bean(x)/(x*0.8)) * (this.genes.flowerWidth * capShapeMask(stemAge + x)  ),
+     
+                var capWidth = this.genes.flowerWidth * (0.5 + (1 - stemAge));
+                var capLength = this.genes.flowerLength  * (0.1 + (1 - stemAge));
+                var capRatio = (capWidth / capLength ) * ((1 - stemAge) * 10);
 
-                // wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2),0.9)-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
-                ben:(x) => capBend
-              });
+
+              // CAP*
+              console.log(capWidth, capLength, capRatio, stemAge, this.genes.flowerWidth);
+              if(stemAge > 0.2) {
+                this.cap({ctx:lay0,
+                  xof:x0+P[-1].x + capOffset,
+                  yof:y0+P[-1].y ,
+                  rot:capRotation,
+                  flo: false,
+                  vei: vei,
+                  len: this.clamp(capLength, sheathLength , sheathLength + this.genes.flowerLength ) ,
+                  col: this.genes.flowerColor,
+                  wid: (x) => Util.bean(x / capShapeMask(x)) * (Util.bean(x)/(x*0.5)) * (((capWidth + this.genes.stemWidth * 1.9) * stemAge )   ),//, this.genes.stemWidth * 1.7, capWidth * capLength),
+                  // wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2),0.9)-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
+                  ben:(x) => capBend
+                });
+              }
 
 
 
@@ -1861,14 +1875,14 @@
             // m = Util.sigmoid( ( m) * mCurve[0], mCurve[1]) * 0.7
    
               //Adds shading
-              var mCurve = this.curveCoeff4;
+              var mCurve = this.curveCoeff3;
               Util.sigmoid( m * mCurve[0], mCurve[1]) * 2.2;// * mCurve[0]/Util.PI//* Util.cos(Util.PI/seg) * 0.09 * (0.7 )
     
-              var pcurve = this.curveCoeff0;
-              Util.sigmoid( p * pcurve[0], pcurve[1]) * Util.sin(Util.PI/1*seg); //* Util.mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
+              var pcurve = this.curveCoeff4;
+              var px = Util.sigmoid( p * pcurve[0], pcurve[1]) * (12);//* Util.sin(Util.PI/1*seg) //* Util.mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
     
-              var ncurve = this.curveCoeff2;
-              Util.sin( ( n) * ncurve[0], ncurve[1]); //  * Util.cos(Util.PI/px) * 0.1//* (Math.Util.PI/2) 
+              var ncurve = this.curveCoeff3;
+              var nx = Util.sin( ( n) * ncurve[0], ncurve[1]); //  * Util.cos(Util.PI/px) * 0.1//* (Math.Util.PI/2) 
       
     
             var p0 = v3.lerp(L[i-1],R[i-1],m); //- Util.mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
@@ -1878,12 +1892,18 @@
             var p3 = v3.lerp(L[i],R[i],n);
 
 
-            var lt = n/p;// * 0.5 + 0.1 
+            var spec = (Math.PI/px) + px*nx;
 
-            var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise((p*noiseScale) ,m*noiseScale,n*noiseScale),0,1,0.5,1);
-            var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1);
-            var v = Util.mapval(lt,0,1,col.min[2],col.max[2]);// *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0,1)
-            Util.mapval(lt,0.8,1,col.min[3],col.max[3]);
+            // var lt = nx/px 
+            var lt = (((Math.sin(Math.PI*n))/px  * Util.sigmoid(Math.PI* px)) * spec); //+ (n+m+p)
+
+            // var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise((p*noiseScale) ,m*noiseScale,n*noiseScale),0,1,0.5,1)
+            // var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0.2,1,0.8,1)
+            // var v = Util.mapval(lt,0,1,col.min[2],col.max[2]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0.5,1,0.9,1)
+            var h = Util.lerpHue(col.min[0],col.max[0],lt)*Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1);
+            var s = Util.mapval(lt,0,1,col.max[1],col.min[1])*Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1);
+            var v = Util.mapval(lt,0,1,col.min[2],col.max[2])*Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1);
+            Util.mapval(lt,0,1,col.min[3],col.max[3]);
 
             // console.log(col.min[0], col.max[0], h, lt, this.dna.color([h,s,v,a]).humanName)
             if(gil){
@@ -1891,12 +1911,13 @@
                 xof:xof,yof:yof,fil:true, str:true,col:Util.hsv(h,s*0.8,v*0.6,0.7)}); 
             }else {
               this.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
-                xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,0.8)});
+                xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,0.9)});
             }
 
           }
 
         }
+        if(vei[0] != 0) {
         for (var i = 1; i < P.length; i++){
           for (var j = 0; j < vei[1]; j++){
             var p = j/vei[1];
@@ -1914,6 +1935,7 @@
           }
         }
         this.stroke({ctx:ctx,pts:P,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.3)});
+        }
 
         this.stroke({ctx:ctx,pts:L,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.5)});
         this.stroke({ctx:ctx,pts:R,xof:xof,yof:yof,col:Util.rgba(0,0,0,0.6)});
