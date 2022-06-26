@@ -45,7 +45,7 @@ export class Fungus extends Plant {
         this.genes.branchColor = {min: [Util.normRand(50.63842005726726, 56),Util.normRand(0.2,0.32),Util.normRand(0.26011155920859, 0.34),0.999],
           max: [Util.normRand(58.63842005726724, 62),Util.normRand(0.4, 0.7),Util.normRand(0.86011155920859, 0.99),0.999]}
         
-        let vei = [Util.randChoice([0,1]),Util.normRand(0,12)]
+        let vei = [Util.randChoice([0,1]),Util.normRand(6,12)]
   
         for (var i = 0; i < Math.floor(this.genes.stemCount ); i++){
             var r = [Util.PI/2,0,Util.normRand(-1,1)*Util.PI]
@@ -80,7 +80,6 @@ export class Fungus extends Plant {
             var desiredSheathLength = this.genes.sheathLength * (stemAge + 1.2)
             var sheathLength = this.clamp(desiredSheathLength * (0.1 + (1 - stemAge)), 0, desiredSheathLength/6)
             if (this.genes.sheathLength > 0){
-                console.log("DSL", desiredSheathLength, "SCLAMP", P[-1].y - P[-2].y)
                 this.stem({ctx:lay0,
                     xof:x0+P[-1].x + capOffset + (-1* sheathRotation.x), 
                     yof:y0+P[-1].y + 10 ,
@@ -107,23 +106,17 @@ export class Fungus extends Plant {
 
             var capBend = [0,0,0];//capRotation;
 
-            // this.leaf({ctx:lay0,xof:x0+P[-1].x + capOffset,yof:y0+P[-1].y + gillOffset,
-            //   rot:capRotation,
-            //   len:(this.genes.flowerLength+gillOffset*3.5),
-            //   gil: true,
-            //   col:this.genes.leafColor,// {min:[20,0.29,0.7,1],max:[80,0.4,0.9,1]},               
-            //   // wid:(x) => Util.deltoid(x,0.02),
-            //   wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2))-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.3, 18,30) *0.9),
-            //   ben:(x) => (capBend)})
+            var capWidth = this.genes.flowerWidth * (0.5 + (1 - stemAge))
+            var capLength = this.genes.flowerLength  * (0.1 + (1 - stemAge))
+            var capRatio = (capWidth / capLength ) * ((1 - stemAge) * 10)
 
-   
-              var capWidth = this.genes.flowerWidth * (0.5 + (1 - stemAge))
-              var capLength = this.genes.flowerLength  * (0.1 + (1 - stemAge))
-              var capRatio = (capWidth / capLength ) * ((1 - stemAge) * 10)
-
-
+            
+            var capOpenCurve = (x,op) => {
+                  return (x < 0.1) ? 
+                1-op*this.curveCoeff3[1]
+              : Noise.noise(x,this.curveCoeff3[0])
+            }
             // CAP*
-            console.log(capWidth, capLength, capRatio, stemAge, this.genes.flowerWidth)
             if(stemAge > 0.2) {
               this.cap({ctx:lay0,
                 xof:x0+P[-1].x + capOffset,
@@ -135,7 +128,7 @@ export class Fungus extends Plant {
                 col: this.genes.flowerColor,
                 wid: (x) => Util.bean(x / capShapeMask(x)) * (capShape(x)) * (((capWidth + this.genes.stemWidth * 1.9) * stemAge )   ),//, this.genes.stemWidth * 1.7, capWidth * capLength),
                 // wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2),0.9)-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
-                ben:(x) => capBend
+                ben:(x) => ([-capOpenCurve(x, stemAge * 1.1), -capOpenCurve(x, stemAge * 2.2) ,0])
               })
             }
 
@@ -163,8 +156,6 @@ export class Fungus extends Plant {
         (x) => ([Util.normRand(-10,10),0,Util.normRand(-5,5)])
     
     
-      // console.log(xof, yof, rot, len, seg, wid, col, ben)
-    
       var disp = v3.zero
       var crot = v3.zero
       var P = [disp]
@@ -179,72 +170,66 @@ export class Fungus extends Plant {
         ROT.push(crot);
         P.push(disp);
       }
+
       var [L,R] = this.tubify({pts:P,wid:wid})
-      var wseg = 18 + Math.floor(seg/2) // Math.abs(this.dna.genes.flowerWidth/Util.normRand(2,3)).toFixed(0);
+      var wseg = 18 + Math.floor(seg/2);
       var noiseScale = this.dna.genes.noiseScale ; 
+      crot = v3.zero
       for (var i = 1; i < P.length; i++){
         for (var j = 1; j < wseg; j++){
           var m = (j-1)/(wseg-1);
           var n = j/(wseg-1);
           var p = i/(P.length-1)
-          // var pcurve = this.curveCoeff2;
-          // p = Util.sigmoid( (j*p) * pcurve[0], pcurve[1]) * 0.4
-          // var mCurve = this.curveCoeff2
-          // m = Util.sigmoid( ( m) * mCurve[0], mCurve[1]) * 0.7
+
  
-            //Adds shading
-            var mCurve = this.curveCoeff4
-            var mx = Util.sigmoid( m * mCurve[0], mCurve[1]) * 2.2// * mCurve[0]/Util.PI//* Util.cos(Util.PI/seg) * 0.09 * (0.7 )
+          //Adds shading
+          var mCurve = this.curveCoeff4
+          var mx = Util.sigmoid( m * mCurve[0], mCurve[1]) * 2.2// * mCurve[0]/Util.PI//* Util.cos(Util.PI/seg) * 0.09 * (0.7 )
+
+          var pcurve = this.curveCoeff3
+          var px = Util.sigmoid( p * pcurve[0], pcurve[1]) * (12)//* Util.sin(Util.PI/1*seg) //* Util.mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
+
+          var ncurve = this.curveCoeff3
+          var nx = Util.sin( ( n) * ncurve[0], ncurve[1]) //  * Util.cos(Util.PI/px) * 0.1//* (Math.Util.PI/2) 
   
-            var pcurve = this.curveCoeff3
-            var px = Util.sigmoid( p * pcurve[0], pcurve[1]) * (12)//* Util.sin(Util.PI/1*seg) //* Util.mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
-  
-            var ncurve = this.curveCoeff3
-            var nx = Util.sin( ( n) * ncurve[0], ncurve[1]) //  * Util.cos(Util.PI/px) * 0.1//* (Math.Util.PI/2) 
-    
-  
+
+          var colorRotation =  v3.add(crot,v3.scale(ben(p),px))
           var p0 = v3.lerp(L[i-1],R[i-1],m) //- Util.mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
           var p1 = v3.lerp(L[i],R[i],m) //- Util.mapval(Noise.noise(p/noiseScale,m*noiseScale,n*noiseScale),0,1,0,mx)
     
           var p2 = v3.lerp(L[i-1],R[i-1],n)
           var p3 = v3.lerp(L[i],R[i],n)
 
+          var lt = mx/p + nx/p ;
 
-          var spec = (Math.PI/px) + px*nx
-
-          // var lt = nx/px 
-          var lt = mx/p + nx/p ;//(((Math.sin(Math.PI*nx))/nx  * Util.sigmoid(Math.PI* px)) * spec) //+ (n+m+p)
-
-          // var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise((p*noiseScale) ,m*noiseScale,n*noiseScale),0,1,0.5,1)
-          // var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0.2,1,0.8,1)
-          // var v = Util.mapval(lt,0,1,col.min[2],col.max[2]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0.5,1,0.9,1)
           var h = Util.lerpHue(col.min[0],col.min[0],lt) //* Util.mapval(Noise.noise(px*noiseScale,mx*noiseScale,nx*noiseScale),0,1,0.5,1)
-          var s = Util.mapval(lt,0,1,col.max[1],col.min[1])//*Util.mapval(Noise.noise(px*noiseScale,m*noiseScale/200,n*noiseScale),0,1,0.5,1)
-          var l = Util.mapval(lt,0,1,col.min[2],col.max[2])*Util.mapval(Noise.noise(p*noiseScale/190,mx*noiseScale,nx*noiseScale),0,1,0.3,1)
+          var s = Util.mapval(lt,0,1.4, (colorRotation.y > 0) ? -colorRotation.y  : col.max[1] - 0.3, col.min[1])//*Util.mapval(Noise.noise(p*noiseScale/190,mx*noiseScale*20,n*noiseScale),0.1,1,0,1)
+          var l = Util.mapval(lt,0,1, (colorRotation.y > 0) ? -colorRotation.y  : col.min[2] - (0.33) ,col.max[2])*Util.mapval(Noise.noise(p*noiseScale/190,mx*noiseScale*20,n*noiseScale ),0,1,0.1,1)
           var a = Util.mapval(lt,0,1,col.min[3],col.max[3])
 
-          // console.log(col.min[0], col.max[0], h, lt, this.dna.color([h,s,v,a]).humanName)
-          if(gil){
-            this.polygon({ctx:ctx,pts:[p0,p0,p2,p3],
-              xof:xof,yof:yof,fil:true, str:true,col:Util.hsv(h,s*0.8,v*0.6,a)}) 
-          }else{
-            this.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
-              xof:xof,yof:yof,fil:true,str:true,col:Util.hsl(h,s,l,0.9)})
-          }
+
+          this.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
+            xof:xof,yof:yof,fil:true,str:true,col:Util.hsl(h,s,l,0.9)})
 
         }
 
       }
       if(vei[0] != 0) {
       for (var i = 1; i < P.length; i++){
+        
         for (var j = 0; j < vei[1]; j++){
-          var p = j/vei[1];
+
+          var p =  j/vei[1];
+          var colorRotation =  v3.add(crot,v3.scale(ben(p),px))
   
+
           var p0 = v3.lerp(L[i-1],P[i-1],p)
           var p1 = v3.lerp(L[i],P[i],p)
   
           var q0 = v3.lerp(R[i-1],P[i-1],p)
           var q1 = v3.lerp(R[i],P[i],p)
+
+
           this.polygon({ctx:ctx,pts:[p0,p1],
             xof:xof,yof:yof,fil:false,col:Util.hsv(0,0,0,Util.normRand(0.4,0.9))})
           this.polygon({ctx:ctx,pts:[q0,q1],
