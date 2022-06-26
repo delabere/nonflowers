@@ -103,7 +103,7 @@ export class Fungus extends Plant {
             var capVariation = Util.normRand(0.5,2.5)
             var capShapeMask  = (x) => ( Util.deltoid(Util.sin(Math.PI*x),this.genes.capShapeMaskCoeff *capVariation , Math.PI/2)) 
             // var capShape = (x) => (Util.deltoid(Noise.noise(x,this.genes.flowerShapeNoiseSeed),this.genes.flowerShapeMaskCoeff, 1.2)*capShapeMask(x))
-            var capShape = (x) => Util.sin(Math.PI*x ) * Math.cos(x*40)
+            var capShape = (x) => Util.bean(x)/(x*0.5); //Util.sin(Math.PI*x ) * Math.cos(x*40)
 
             var capBend = [0,0,0];//capRotation;
 
@@ -131,9 +131,9 @@ export class Fungus extends Plant {
                 rot:capRotation,
                 flo: false,
                 vei: vei,
-                len: this.clamp(capLength, sheathLength , sheathLength + this.genes.flowerLength ) ,
+                len: this.clamp(capLength, sheathLength + 10, sheathLength + this.genes.flowerLength ) ,
                 col: this.genes.flowerColor,
-                wid: (x) => Util.bean(x / capShapeMask(x)) * (Util.bean(x)/(x*0.5)) * (((capWidth + this.genes.stemWidth * 1.9) * stemAge )   ),//, this.genes.stemWidth * 1.7, capWidth * capLength),
+                wid: (x) => Util.bean(x / capShapeMask(x)) * (capShape(x)) * (((capWidth + this.genes.stemWidth * 1.9) * stemAge )   ),//, this.genes.stemWidth * 1.7, capWidth * capLength),
                 // wid:(x) => capShape(x) * this.genes.flowerWidth*(Util.sin(Util.cos(x*Util.PI/2),0.9)-Util.cos(x*Util.PI/2)*this.clamp(this.genes.flowerWidth*0.5, 18,30)),
                 ben:(x) => capBend
               })
@@ -193,10 +193,10 @@ export class Fungus extends Plant {
           // m = Util.sigmoid( ( m) * mCurve[0], mCurve[1]) * 0.7
  
             //Adds shading
-            var mCurve = this.curveCoeff3
+            var mCurve = this.curveCoeff4
             var mx = Util.sigmoid( m * mCurve[0], mCurve[1]) * 2.2// * mCurve[0]/Util.PI//* Util.cos(Util.PI/seg) * 0.09 * (0.7 )
   
-            var pcurve = this.curveCoeff4
+            var pcurve = this.curveCoeff3
             var px = Util.sigmoid( p * pcurve[0], pcurve[1]) * (12)//* Util.sin(Util.PI/1*seg) //* Util.mapval(Noise.noise(p*noiseScale, m*noiseScale, n*noiseScale),0.2,0.5,0.2,1) 
   
             var ncurve = this.curveCoeff3
@@ -213,23 +213,23 @@ export class Fungus extends Plant {
           var spec = (Math.PI/px) + px*nx
 
           // var lt = nx/px 
-          var lt = (((Math.sin(Math.PI*n))/px  * Util.sigmoid(Math.PI* px)) * spec) //+ (n+m+p)
+          var lt = mx/p + nx/p ;//(((Math.sin(Math.PI*nx))/nx  * Util.sigmoid(Math.PI* px)) * spec) //+ (n+m+p)
 
           // var h = Util.lerpHue(col.min[0],col.max[0],lt) *Util.mapval(Noise.noise((p*noiseScale) ,m*noiseScale,n*noiseScale),0,1,0.5,1)
           // var s = Util.mapval(lt,0,1,col.max[1],col.min[1]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0.2,1,0.8,1)
           // var v = Util.mapval(lt,0,1,col.min[2],col.max[2]) *Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0.5,1,0.9,1)
-          var h = Util.lerpHue(col.min[0],col.max[0],lt)*Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-          var s = Util.mapval(lt,0,1,col.max[1],col.min[1])*Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
-          var v = Util.mapval(lt,0,1,col.min[2],col.max[2])*Util.mapval(Noise.noise(p*noiseScale,m*noiseScale,n*noiseScale),0,1,0.5,1)
+          var h = Util.lerpHue(col.min[0],col.min[0],lt) //* Util.mapval(Noise.noise(px*noiseScale,mx*noiseScale,nx*noiseScale),0,1,0.5,1)
+          var s = Util.mapval(lt,0,1,col.max[1],col.min[1])//*Util.mapval(Noise.noise(px*noiseScale,m*noiseScale/200,n*noiseScale),0,1,0.5,1)
+          var l = Util.mapval(lt,0,1,col.min[2],col.max[2])*Util.mapval(Noise.noise(p*noiseScale/190,mx*noiseScale,nx*noiseScale),0,1,0.3,1)
           var a = Util.mapval(lt,0,1,col.min[3],col.max[3])
 
           // console.log(col.min[0], col.max[0], h, lt, this.dna.color([h,s,v,a]).humanName)
           if(gil){
             this.polygon({ctx:ctx,pts:[p0,p0,p2,p3],
-              xof:xof,yof:yof,fil:true, str:true,col:Util.hsv(h,s*0.8,v*0.6,0.7)}) 
+              xof:xof,yof:yof,fil:true, str:true,col:Util.hsv(h,s*0.8,v*0.6,a)}) 
           }else{
             this.polygon({ctx:ctx,pts:[p0,p1,p3,p2],
-              xof:xof,yof:yof,fil:true,str:true,col:Util.hsv(h,s,v,0.9)})
+              xof:xof,yof:yof,fil:true,str:true,col:Util.hsl(h,s,l,0.9)})
           }
 
         }

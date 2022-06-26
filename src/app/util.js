@@ -24,7 +24,7 @@ export class Util {
     }
 
     static hsv(h, s, v, a) {
-        h = (h != undefined ) ? this.clamp(h, 0, 360):359;
+        h = (h != undefined ) ? this.clamp(h, 0, 360):360;
         s = (s != undefined) ? this.clamp(s, 0, 1.0):1;
         v = (v != undefined) ? this.clamp(v, 0, 1.0):1;
         a = (a != undefined) ? this.clamp(a, 0, 1.0):1.0;
@@ -38,6 +38,41 @@ export class Util {
         return this.rgba(r,g,b,a)
 
     }
+
+    static hsl(h, s, l, a) {
+        h = (h != undefined ) ? this.clamp(h, 0, 360):360;
+        s = (s != undefined) ? this.clamp(s, 0, 1.0):1;
+        l = (l != undefined) ? this.clamp(l, 0, 1.0):1;
+        a = (a != undefined) ? this.clamp(a, 0, 1.0):1.0;
+        let c = (1 - Math.abs(2 * l - 1)) * s
+        let x = c*(1-Math.abs((h/60)%2-1))
+        let m = l-c/2
+        let r = 0, g = 0, b = 0;
+        // let [rv,gv,bv] = ([[c,x,0],[x,c,0],[0,c,x],
+        //                     [0,x,c],[x,0,c],[c,0,x]])[Math.floor(h/60)]
+        // let [r,g,b] = [(rv+m)*255,(gv+m)*255,(bv+m)*255,a]
+
+        if (0 <= h && h < 60) {
+            r = c; g = x; b = 0;  
+          } else if (60 <= h && h < 120) {
+            r = x; g = c; b = 0;
+          } else if (120 <= h && h < 180) {
+            r = 0; g = c; b = x;
+          } else if (180 <= h && h < 240) {
+            r = 0; g = x; b = c;
+          } else if (240 <= h && h < 300) {
+            r = x; g = 0; b = c;
+          } else if (300 <= h && h < 360) {
+            r = c; g = 0; b = x;
+          }
+          r = Math.round((r + m) * 255);
+          g = Math.round((g + m) * 255);
+          b = Math.round((b + m) * 255);
+
+        return this.rgba(r,g,b,a)
+
+    }
+
 
    
 
