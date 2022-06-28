@@ -5,10 +5,15 @@ import { Util } from '../app/util.js';
 
 export class Woody extends Plant {
 
-    BASE_NAMES = [ "bindweed", "vine", "creeper", "wisteria", "Jade", "Tassel", "Lilac", "Magnolia", "Olive", "Quince", "Bramble", "Jasmine"];
-    MOOD_ADJECTIVES = ["dwarf", "Fragrant", "feathered", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
-    LOCATION_ADJECTIVES = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
     type = "woody";
+    grammar = {
+      "name":["#commonName.capitalizeAll#"],
+      "plantName": [ "bindweed", "vine", "creeper", "wisteria", "Jade", "Tassel", "Lilac", "Magnolia", "Olive", "Quince", "Bramble", "Jasmine"],
+      "location": ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"],
+      "gender": ["man", "lady"],
+      "mood": ["dwarf", "Fragrant", "feathered", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"],
+      "commonName": ["#mood# #plantName#", "#mood# #location# #plantName#", "#mood# #plantName# of the #location#"]
+    };
 
     constructor(dna) {
         super(dna);

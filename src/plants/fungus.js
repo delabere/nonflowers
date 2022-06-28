@@ -5,15 +5,23 @@ import {Util} from './../app/util.js';
 import { v3 } from '../app/v3.js';
 
 import { ColorRangeDescriptor } from './../app/colorRangeDescriptor.js';
+import tracery from 'tracery-es8';
 
 export class Fungus extends Plant {
 
     //create a list of mushroom names.
-    BASE_NAMES = ["Cap", "Fingers", "Mushroom", "Fungus", "Stool", "Umbrella", "Hat", "Crown", "Stem"] 
-    // stinky man fingers
     MOOD_ADJECTIVES = ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "stinky", "spongy", "inky", "toppled", "reaching", "upright"];
     LOCATION_ADJECTIVES = ["cave","man", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
     type = "fungus";
+
+    grammar = {
+      "name":["#commonName.capitalizeAll#"],
+      "plantName": ["Cap", "Fingers", "Mushroom", "Fungus", "Stool", "Umbrella", "Hat", "Crown", "Stem"],
+      "location": ["cave","man", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"],
+      "gender": ["man", "lady"],
+      "mood": ["foul", "Fragrant", "dwarf", "giant", "plain", "mysterious", "nervous",  "thoughtless", "stinky", "spongy", "inky", "toppled", "reaching", "upright"],
+      "commonName": ["#mood# #plantName#", "#mood# #location# #plantName#", "#mood# #plantName# of the #location#"]
+    };
 
     constructor(dna) {
         super(dna);

@@ -23,6 +23,7 @@
     "colortranslator": "^1.9.2",
     "named-web-colors": "^1.4.2",
     "seedrandom": "^3.0.5",
+    "tracery-es8": "^1.1.0",
     "watch": "^0.13.0"
   },
   "devDependencies": {

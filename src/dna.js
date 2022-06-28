@@ -9,12 +9,14 @@ export class DNA {
         if(typeof(genes) == "undefined" || genes.seed == null) {
           this.seed = DNA.newSeed(); 
         }else if( typeof(genes.seed) !== "undefined" && genes.seed !== null)  { 
-          console.log('genes seed', genes.seed)
+          console.log('seed from genes', genes.seed)
           this.seed = genes.seed.toString();
         }
-        Math.seed(this.seed);
-        PAR.seed = Number(this.seed);
+        // Seed the random number generator with the seed
+        PAR.seed = Math.seed(this.seed);
+        // PAR.seed = Number(this.seed);
         var randint = (x,y) => (Math.floor(Util.normRand(x,y)))
+        
       
 
         const clamp = (num, min, max) => Math.min(Math.max(num, min), max);

@@ -6,9 +6,14 @@ import {ColorRangeDescriptor} from './../app/colorRangeDescriptor.js';
 
 export class Flowering extends Plant {
 
-    BASE_NAMES = ["Poppy", "Dahlia", "Flower", "Petal", "Iris", "Jade", "Tassel", "Lilac", "Magnolia", "Narcissus", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Violet", "Willow", "Lily", "Bell" ];
-    MOOD_ADJECTIVES = ["Tasteless", "Dwarf", "Fragrant", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"];
-    LOCATION_ADJECTIVES = ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "moon", "sun", "star", "swamp", "heavens", "sky", "cliff"];
+    grammar = {
+        "name":["#commonName.capitalizeAll#"],
+        "plantName": ["Poppy", "Dahlia", "Flower", "Petal", "Iris", "Jade", "Tassel", "Lilac", "Magnolia", "Narcissus", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Violet", "Willow", "Lily", "Bell" ],
+        "location": ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "moon", "sun", "star", "swamp", "heavens", "sky", "cliff"],
+        "gender": ["man", "lady"],
+        "mood": ["Tasteless", "Dwarf", "Fragrant", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"],
+        "commonName": ["#mood# #plantName#", "#mood# #location# #plantName#", "#mood# #plantName# of the #location#"]
+    };
 
     type = "flowering";
 

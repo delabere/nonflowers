@@ -6,13 +6,19 @@ import {v3} from './../app/v3.js';
 import {Util} from '../app/util.js';
 import { Drawable } from '../drawable.js';
 import { ColorRangeDescriptor } from '../app/colorRangeDescriptor.js';
-import { NameGenerator } from '../app/nameGenerator.js';
+import tracery from 'tracery-es8';
+// import { NameGenerator } from '../app/nameGenerator.js';
 
 export class Plant extends Drawable {
 
-    BASE_NAMES = ["Poppy", "Dahlia", "Fern", "Flower", "Petal", "Iris", "Jade", "Kale", "Stickweed", "Tassel", "Lilac", "Magnolia", "Narcissus", "Olive", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Viovar", "Willow", "Lily"];
-    MOOD_ADJECTIVES = ["Fragrant", "adorable", "jealous", "beautiful", "clean", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "lazy", "mysterious", "nervous", "panicky", "thoughtless", "thorny", "thornless", "upright", "worried"];
-    LOCATION_ADJECTIVES = ["cave", "dwarf", "hill", "island", "mountain", "ocean", "plain", "river", "sea", "swamp", "heavens", "sky", "cliff"];
+    grammar = {
+      "name":["#commonName.capitalizeAll#"],
+      "plantName": ["Poppy", "Dahlia", "Flower", "Petal", "Iris", "Jade", "Tassel", "Lilac", "Magnolia", "Narcissus", "Quince", "Rose", "Sunflower", "Tulip", "Umbrella", "Violet", "Willow", "Lily", "Bell" ],
+      "location": ["cave", "hill", "mountain", "ocean", "plain", "river", "sea", "moon", "sun", "star", "swamp", "heavens", "sky", "cliff"],
+      "gender": ["man", "lady"],
+      "mood": ["Tasteless", "Dwarf", "Fragrant", "wandering", "adorable", "jealous", "beautiful", "drooping", "drab", "elegant", "fancy", "glamorous", "handsome", "long", "magnificent", "old-fashioned", "plain", "quaint", "sparkling", "water",  "unsightly", "wide-eyed", "angry", "bewildered", "clumsy", "embarrassed", "fierce", "helpless", "itchy", "jealous", "hopeless", "lazy", "mysterious", "nervous",  "thoughtless", "thorny", "thornless", "upright"],
+      "commonName": ["#mood# #plantName#", "#mood# #location# #plantName#", "#mood# #plantName# of the #location#"]
+    };
 
     type = "plant"
 
@@ -49,13 +55,9 @@ export class Plant extends Drawable {
         if(this.plantName !== undefined) {
             return this.plantName;
         }else{
-          let nameGenerator = new NameGenerator({
-            baseNames: this.BASE_NAMES,
-            moodAdjectives: this.MOOD_ADJECTIVES,
-            locationAdjectives: this.LOCATION_ADJECTIVES
-          })
-          this.plantName = nameGenerator.name()
-          return this.plantName;
+          let nameGenerator = tracery.createGrammar(this.grammar);
+          nameGenerator.addModifiers(tracery.baseEngModifiers);
+          return nameGenerator.flatten("#name#");
         }
     }
 

@@ -49,7 +49,7 @@ class Generator {
 
     _UpdateFromUI() {
 
-        let rng = new Math.seedrandom(); // call with new to create a standalone generator without affecting Math.random() yet.
+        new Math.seedrandom(); // call with new to create a standalone generator without affecting Math.random() yet.
         Math.seed = function(x) { return Math.seedrandom(x); }
 
     }
@@ -76,11 +76,11 @@ class Generator {
             };
 
             if(this.geneEditor.isEmpty) {
-                console.log("EDITING", this.geneEditor.dna)
+                // console.log("EDITING", this.geneEditor.dna)
                 options.dna = new DNA(this.geneEditor.dna);
                 renderObject.innerHTML = "";
             }else{
-                console.log("NEW")
+                // console.log("NEW")
                 console.log('OPTION SEED:', options.dna.seed)
                 options.dna = new DNA(options.dna);
             }

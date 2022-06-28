@@ -1,5 +1,5 @@
 import {Descriptor} from '../app/descriptor.js';
-
+import tracery from 'tracery-es8';
 export class NameGenerator {
 
     constructor(args) {
