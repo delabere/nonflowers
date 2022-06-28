@@ -45,6 +45,8 @@ export class Flowering extends Plant {
 
         for (var i = 0; i < this.genes.stemCount; i++){
 
+            // Stems
+
             let r = [Util.PI/2,0,Util.normRand(-1,1)*Util.PI]
             let P = this.stem({
                 ctx:lay0,xof:x0,yof:y0,
@@ -60,6 +62,8 @@ export class Flowering extends Plant {
                 )})
             
         
+            // Leaves
+
             if (this.genes.leafPosition == 2){
                 for (let j = 0; j < P.length; j++) {
                     if (Math.random() < this.genes.leafChance*2){
@@ -79,6 +83,8 @@ export class Flowering extends Plant {
                 }      
             }
         
+
+            // Sheath
         
             let hr = Util.grot(P,-1)
             if (this.genes.sheathLength != 0){
@@ -92,6 +98,8 @@ export class Flowering extends Plant {
                     ben:(x) => ([0,0,0])
                 })
             }
+
+            // Shoots 
 
             for (let j = 0; j < Math.max(1,this.genes.shootCount*Util.normRand(0.5,1.5)); j++){
 
@@ -110,6 +118,8 @@ export class Flowering extends Plant {
 
                 let op = Math.random()
                 let hhr = [Util.normRand(-1,1)*Util.PI,Util.normRand(-1,1)*Util.PI,Util.normRand(-1,1)*Util.PI]
+
+                // Flowers
 
                 for (let k = 0; k < this.genes.flowerPetal; k++){
                     

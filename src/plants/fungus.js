@@ -60,16 +60,35 @@ export class Fungus extends Plant {
             var capOffset =  Util.normRand(-90,10);
             var gillOffset = 6
 
+            var stemLength = this.genes.stemLength * Util.normRand(0.002, 1) ;
+            // Volva
+                // gill shape
+                // wid: (x) =>  (this.genes.stemWidth * 0.8 )/(Util.bean(Util.sigmoid(x*Util.PI*0.144),1)-Util.sigmoid(x*0.85)+flare),//Util.bean(x * (this.genes.sheathWidth + this.genes.stemWidth * stemAge)) + (this.genes.stemWidth * 1) +  this.genes.stemWidth*(Util.pow(Util.sin(x*Util.PI),2)-x*0.5+0.5),
+
+            var flare = 0.37;
+            var V = this.stem({ctx:lay1,
+                xof:x0 + capOffset , 
+                yof:y0,
+                rot: r,
+                len:stemLength / 10, //this.genes.sheathLength,//this.clamp(desiredSheathLength, 0, P[-1].y + P[-2].y ),//this.clamp( desiredSheathLength, (this.genes.sheathLength * stemAge) , (this.genes.flowerLength + this.genes.sheathLength) * ( stemAge + 0.5)  ),
+                seg: 18,
+                col: {min:  [70,0.2,0.7,0.9], max: [70,0.2,0.9,0.9]},
+                // wid:(x) => (this.genes.stemWidth * 1.3 )*(Util.pow(Util.sin(x*Util.PI),1)-x*0.5+0.6),
+                wid: (x) =>  (this.genes.stemWidth * 0.8 )/(Util.bean(Util.sigmoid(x*Util.PI*0.144),1)-Util.sin(x*0.78)+flare),//Util.bean(x * (this.genes.sheathWidth + this.genes.stemWidth * stemAge)) + (this.genes.stemWidth * 1) +  this.genes.stemWidth*(Util.pow(Util.sin(x*Util.PI),2)-x*0.5+0.5),
+                ben:(x) => [0,0,0] 
+            })
+
             // STEM
-            var stemLength = this.genes.stemLength * Util.normRand(0.002, 1) + 4;
             var P = this.stem({
-                ctx:lay0,xof:x0 + capOffset,yof:y0,
+                ctx:lay0,
+                xof:x0 + capOffset,
+                yof:y0 ,
                 len:stemLength,
                 rot:r,
-                seg: 30,
+                seg: 70,
                 col: this.genes.branchColor,
                 wid:(x) => (this.genes.stemWidth*
-                    (Util.pow(Util.sin(x*Util.PI/2+Util.PI/2),0.5)*Noise.noise(x*120)*1.2+0.9)),
+                    (Util.pow(Util.sin(x*Util.PI/2+Util.PI/2),0.5)*Noise.noise(x*20)*1.2+0.9)),
                 ben:(x) => ([
                     (Util.mapval(Noise.noise(x*1,i),0,1,-1,1)*x* this.genes.stemBend) * Util.normRand(0.2, 0.8) , 
                     0,
@@ -85,24 +104,45 @@ export class Fungus extends Plant {
             this.genes.sheathLength = (this.genes.sheathLength <= 0) ? this.genes.flowerLength + 180 : this.genes.sheathLength//* stemAge
             var sheathRatio = this.genes.sheathLength == 0 ? 1 : (this.genes.sheathWidth / this.genes.sheathLength) 
             var sheathRotation = Util.grot(P,-2)
-            var desiredSheathLength = this.genes.sheathLength * (stemAge + 1.2)
+            var desiredSheathLength = this.genes.sheathLength * (stemAge + 0.3)
             var sheathLength = this.clamp(desiredSheathLength * (0.1 + (1 - stemAge)), 0, desiredSheathLength/6)
+
+
+            let hr = Util.grot(P,-1)
+
+
+            // Shoot
+            let P_ = this.stem({ctx:lay0,
+              xof:x0+P[-1].x + capOffset,
+              yof:y0+P[-1].y,
+              rot:hr,
+              len:sheathLength * stemAge ,
+              col:{min:[70,0.2,0.9,1],max:[70,0.2,0.9,1]},
+              wid:(x) => (this.genes.stemWidth),
+              ben:(x) => ([0,0,0])
+                  // Util.mapval(Noise.noise(x*1,i),0,1,-1,1)*x*10,
+                  // 0,
+                  // Util.mapval(Noise.noise(x*1,i+Util.PI),0,1,-1,1)*x*10
+              // ])})
+            })
+
+
+            // Skirt
+
             if (this.genes.sheathLength > 0){
-                this.stem({ctx:lay0,
-                    xof:x0+P[-1].x + capOffset + (-1* sheathRotation.x), 
-                    yof:y0+P[-1].y + 10 ,
-                    rot: sheathRotation,
-                    len:sheathLength,//this.clamp(desiredSheathLength, 0, P[-1].y + P[-2].y ),//this.clamp( desiredSheathLength, (this.genes.sheathLength * stemAge) , (this.genes.flowerLength + this.genes.sheathLength) * ( stemAge + 0.5)  ),
-                    seg: 18,
-                    col: this.genes.innerColor,
-                    wid:(x) => (this.genes.stemWidth )*(Util.pow(Util.sin(x*Util.PI),1)-x*0.5+0.6),
-                    // wid: (x) => Util.bean(x * (this.genes.sheathWidth + this.genes.stemWidth * stemAge)) + (this.genes.stemWidth * 1) +  this.genes.stemWidth*(Util.pow(Util.sin(x*Util.PI),2)-x*0.5+0.5),
-                    ben:(x) => [0,0,0] 
-                })
-              }
+              this.stem({ctx:lay0,
+                  xof:x0+P[-1].x + capOffset , 
+                  yof:y0+P[-1].y  ,
+                  rot: hr,
+                  len:sheathLength,//this.clamp(desiredSheathLength, 0, P[-1].y + P[-2].y ),//this.clamp( desiredSheathLength, (this.genes.sheathLength * stemAge) , (this.genes.flowerLength + this.genes.sheathLength) * ( stemAge + 0.5)  ),
+                  seg: 18,
+                  col: {min:  [60,0.2,0.6,0.7], max: [60,0.2,1,0.9]},
+                  // wid:(x) => (this.genes.stemWidth * 1.3 )*(Util.pow(Util.sin(x*Util.PI),1)-x*0.5+0.6),
+                  wid: (x) =>  (this.genes.stemWidth * 1.2 )*(Util.sigmoid(Util.sigmoid(x*Util.PI*3),stemAge)-x*0.5+0.6),//Util.bean(x * (this.genes.sheathWidth + this.genes.stemWidth * stemAge)) + (this.genes.stemWidth * 1) +  this.genes.stemWidth*(Util.pow(Util.sin(x*Util.PI),2)-x*0.5+0.5),
+                  ben:(x) => [0,0,0] 
+              })
+          }
 
-
-            //GILLS
             this.genes.leafColor = {min: [Util.normRand(58, 62),Util.normRand(0.3,0.52),Util.normRand(0.8, 0.94),0.8],
                 max: [Util.normRand(58, 62),Util.normRand(0.2,0.62),Util.normRand(0.4, 0.6),0.2]}
 
@@ -117,7 +157,7 @@ export class Fungus extends Plant {
             var capWidth = this.genes.flowerWidth * (0.5 + (1 - stemAge))
             var capLength = this.genes.flowerLength  * (0.1 + (1 - stemAge))
             var capRatio = (capWidth / capLength ) * ((1 - stemAge) * 10)
-
+            let hhr = [Util.normRand(-1,1)*Util.PI,Util.normRand(-1,1)*Util.PI,Util.normRand(-1,1)*Util.PI]
             
             var capOpenCurve = (x,op) => {
                   return (x < 0.1) ? 
@@ -127,9 +167,12 @@ export class Fungus extends Plant {
             // CAP*
             if(stemAge > 0.2) {
               this.cap({ctx:lay0,
-                xof:x0+P[-1].x + capOffset,
-                yof:y0+P[-1].y ,
-                rot:capRotation,
+                xof:x0+P[-1].x+P_[-1].x + capOffset,
+                yof:y0+P[-1].y+P_[-1].y,
+                // xof:x0+P[-1].x + capOffset,
+                // yof:y0+P[-1].y ,
+                rot: capRotation,
+                // rot:[hhr[0],hhr[1],hhr[2]] ,                
                 flo: false,
                 vei: vei,
                 len: this.clamp(capLength, sheathLength + 10, sheathLength + this.genes.flowerLength ) ,
