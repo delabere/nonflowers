@@ -2519,7 +2519,7 @@
     
           for (var i = 0; i < Math.floor(this.genes.stemCount ); i++){
               var r = [Util$1.PI/2,0,Util$1.normRand(-1,1)*Util$1.PI];
-              var capOffset =  Util$1.normRand( 90 - (this.genes.flowerWidth * i),((this.genes.flowerWidth*3)*i) + 20);
+              var capOffset =  Util$1.normRand( 90 - (this.genes.flowerWidth * i) + Util$1.normRand(10, 20),((this.genes.flowerWidth*3)*i) + Util$1.normRand(10, 20)+ 20);
 
               var stemLength = this.genes.stemLength * Util$1.normRand(0.002, 1) ;
               // Volva

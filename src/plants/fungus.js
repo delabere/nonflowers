@@ -57,7 +57,7 @@ export class Fungus extends Plant {
   
         for (var i = 0; i < Math.floor(this.genes.stemCount ); i++){
             var r = [Util.PI/2,0,Util.normRand(-1,1)*Util.PI]
-            var capOffset =  Util.normRand( 90 - (this.genes.flowerWidth * i),((this.genes.flowerWidth*3)*i) + 20);
+            var capOffset =  Util.normRand( 90 - (this.genes.flowerWidth * i) + Util.normRand(10, 20),((this.genes.flowerWidth*3)*i) + Util.normRand(10, 20)+ 20);
             var gillOffset = 6
 
             var stemLength = this.genes.stemLength * Util.normRand(0.002, 1) ;
