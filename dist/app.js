@@ -5243,7 +5243,7 @@
                   plant.generate({containerElementId: 'canvas-container'});
                       
               if(plantCount == 1) {
-                  this.geneEditor.render(plant.dna.genes);
+                  // this.geneEditor.render(plant.dna.genes);
                   var perRow = 9;
               }else {
                   var perRow = 4;
