@@ -1,6 +1,21 @@
+#!/usr/bin/env python3
 from selenium import webdriver                                                          
 from PIL import Image
 import sys
+#!/usr/bin/env python3
+
+import sys
+
+from PIL import Image
+
+import datetime
+
+# Get today's date
+today = datetime.date.today()
+# Format the date as YYYY-MM-DD
+formatted_date = today.strftime('%Y-%m-%d')
+# Create the filename by interpolating the formatted date
+filename = f"images/image_{formatted_date}.png"
 
 driver_path = 'chromedriver_mac_arm64/chromedriver'
 
@@ -15,10 +30,11 @@ options.add_argument('window-size=480x640')  # Set the desired window size
 driver = webdriver.Chrome(options=options)                                                                                                                                          
 
 driver.get('http://[::]:8000/?plantCount=1')
-driver.save_screenshot(sys.argv[1])
+driver.save_screenshot(filename)
 
 driver.quit()
 
-with Image.open(sys.argv[1]) as img:
+with Image.open(filename) as img:
     rotated_img = img.rotate(90, expand=True)  # Rotate 90 degrees anticlockwise
-    rotated_img.save(sys.argv[1])
+    rotated_img.save(filename)
+
