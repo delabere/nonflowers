@@ -17,8 +17,8 @@ formatted_date = today.strftime('%Y-%m-%d')
 # Create the filename by interpolating the formatted date
 filename = f"images/image_{formatted_date}.png"
 
-driver_path = 'chromedriver_mac_arm64/chromedriver'
-
+# driver_path = 'chromedriver_mac_arm64/chromedriver'
+driver_path = '/usr/lib/chromium-browser/chromedriver'
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
 options.add_argument('--disable-gpu')  # This option is necessary for some versions of Chrome
